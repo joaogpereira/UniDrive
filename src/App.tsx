@@ -8,8 +8,10 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Profile from "./pages/Profile";
 import Regions from "./pages/Regions";
 import RidesList from "./pages/RidesList";
+import RideChat from "./pages/RideChat";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -26,6 +28,11 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } />
             <Route path="/regions" element={
               <ProtectedRoute>
                 <Regions />
@@ -34,6 +41,11 @@ const App = () => (
             <Route path="/regions/:region" element={
               <ProtectedRoute>
                 <RidesList />
+              </ProtectedRoute>
+            } />
+            <Route path="/chat/:rideId" element={
+              <ProtectedRoute>
+                <RideChat />
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound />} />

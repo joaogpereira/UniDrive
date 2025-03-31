@@ -8,12 +8,14 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [userType, setUserType] = useState("passenger");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { register } = useAuth();
@@ -23,7 +25,7 @@ const Register = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!name || !email || !password || !confirmPassword) {
+    if (!name || !email || !password || !confirmPassword || !userType) {
       toast({
         title: "Erro",
         description: "Por favor, preencha todos os campos.",
@@ -44,7 +46,7 @@ const Register = () => {
     setIsLoading(true);
     
     try {
-      await register(name, email, password);
+      await register(name, email, password, userType);
       toast({
         title: "Cadastro realizado!",
         description: "Sua conta foi criada com sucesso.",
@@ -135,6 +137,24 @@ const Register = () => {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Tipo de usuário</Label>
+                <RadioGroup 
+                  value={userType} 
+                  onValueChange={setUserType}
+                  className="flex flex-col space-y-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="passenger" id="passenger" />
+                    <Label htmlFor="passenger" className="cursor-pointer">Passageiro</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="driver" id="driver" />
+                    <Label htmlFor="driver" className="cursor-pointer">Motorista</Label>
+                  </div>
+                </RadioGroup>
               </div>
             </div>
             

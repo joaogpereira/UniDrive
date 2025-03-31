@@ -5,13 +5,14 @@ interface User {
   id: string;
   name: string;
   email: string;
+  userType: "driver" | "passenger";
 }
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string, userType: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -38,7 +39,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const mockUser = {
       id: "user-123",
       name: "Test User",
-      email
+      email,
+      userType: "passenger" as const
     };
     
     setUser(mockUser);
@@ -46,15 +48,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem("user", JSON.stringify(mockUser));
   };
 
-  const register = async (name: string, email: string, password: string) => {
+  const register = async (name: string, email: string, password: string, userType: string) => {
     // Mock registration - in a real app, this would be an API call
-    console.log("Registering:", name, email, password);
+    console.log("Registering:", name, email, password, userType);
     
     // Simulate successful registration
     const mockUser = {
       id: "user-" + Date.now(),
       name,
-      email
+      email,
+      userType: userType as "driver" | "passenger"
     };
     
     setUser(mockUser);

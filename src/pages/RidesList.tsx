@@ -1,11 +1,11 @@
 
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Clock, User, MapPin, Calendar, ArrowLeft, Car, Star } from "lucide-react";
+import { Clock, User, MapPin, Calendar, ArrowLeft, Car, Star, MessageCircle } from "lucide-react";
 
 // Mock data for rides
 const mockRides = {
@@ -54,6 +54,7 @@ const RidesList = () => {
   const [rides, setRides] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const navigate = useNavigate();
   
   useEffect(() => {
     // Simulate API call
@@ -67,11 +68,12 @@ const RidesList = () => {
     }, 800);
   }, [region]);
   
-  const handleBookRide = (rideId: number) => {
+  const handleStartChat = (rideId: number) => {
     toast({
-      title: "Carona reservada!",
-      description: "Sua reserva foi confirmada com sucesso.",
+      title: "Abrindo chat",
+      description: "Você será direcionado para o chat com o motorista e outros passageiros.",
     });
+    navigate(`/chat/${rideId}`);
   };
   
   const regionName = region ? regionNames[region] : "";
@@ -143,10 +145,11 @@ const RidesList = () => {
                           <span className="font-semibold text-unidriver-700">R$ {ride.price.toFixed(2)}</span>
                         </div>
                         <Button 
-                          onClick={() => handleBookRide(ride.id)}
+                          onClick={() => handleStartChat(ride.id)}
                           className="w-full md:w-auto"
                         >
-                          Reservar
+                          <MessageCircle size={18} className="mr-2" />
+                          Conversar
                         </Button>
                       </div>
                     </div>

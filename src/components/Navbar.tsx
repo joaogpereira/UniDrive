@@ -22,10 +22,10 @@ const Navbar = () => {
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
               <>
-                <div className="flex items-center gap-2">
+                <Link to="/profile" className="flex items-center gap-2 hover:text-unidriver-600 transition-colors">
                   <User size={16} className="text-unidriver-600" />
                   <span className="text-gray-700">{user?.name}</span>
-                </div>
+                </Link>
                 <Button 
                   variant="ghost" 
                   size="sm"
