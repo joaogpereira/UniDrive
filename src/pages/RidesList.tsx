@@ -1,13 +1,17 @@
-
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Clock, User, MapPin, Calendar, ArrowLeft, Car, Star, MessageCircle, DollarSign } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import CreateRideForm from "@/components/CreateRideForm";
+import { 
+  Clock, User, MapPin, Calendar, ArrowLeft, Car, 
+  Star, MessageCircle, DollarSign, Plus 
+} from "lucide-react";
 
-// Mock data for rides
 const mockRides = {
   "asa-norte": [
     { id: 1, from: "UnB", to: "Shopping Conjunto Nacional", date: "2023-05-20", time: "14:30", driver: "Carlos Silva", rating: 4.8, price: 15, spots: 3 },
@@ -39,7 +43,6 @@ const mockRides = {
   ],
 };
 
-// Region name mapping
 const regionNames: Record<string, string> = {
   "asa-norte": "Asa Norte",
   "asa-sul": "Asa Sul",
@@ -53,8 +56,10 @@ const RidesList = () => {
   const { region } = useParams<{ region: string }>();
   const [rides, setRides] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { user } = useAuth();
   
   useEffect(() => {
     // Simulate API call
@@ -68,16 +73,18 @@ const RidesList = () => {
     }, 800);
   }, [region]);
   
-  const handlePayment = (rideId: number) => {
+  const handleRideDetails = (rideId: number) => {
     toast({
-      title: "Processando pagamento",
-      description: "Você será direcionado para a tela de pagamento.",
+      title: "Acessando detalhes",
+      description: "Você será direcionado para a tela de detalhes da carona.",
     });
-    navigate(`/payment/${rideId}`);
+    navigate(`/ride-details/${rideId}`);
   };
   
   const regionName = region ? regionNames[region] : "";
   
+  const isDriver = user?.userType === "driver";
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-50">
       <Navbar />
@@ -89,13 +96,25 @@ const RidesList = () => {
           </Link>
         </div>
         
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Caronas em {regionName}
-          </h1>
-          <p className="text-gray-600">
-            Encontre motoristas oferecendo caronas na região de {regionName}.
-          </p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Caronas em {regionName}
+            </h1>
+            <p className="text-gray-600">
+              Encontre motoristas oferecendo caronas na região de {regionName}.
+            </p>
+          </div>
+          
+          {isDriver && (
+            <Button 
+              onClick={() => setShowCreateModal(true)}
+              className="bg-unidriver-600 hover:bg-unidriver-700"
+            >
+              <Plus size={18} className="mr-2" />
+              Criar Carona
+            </Button>
+          )}
         </div>
         
         {loading ? (
@@ -145,11 +164,11 @@ const RidesList = () => {
                           <span className="font-semibold text-unidriver-700">R$ {ride.price.toFixed(2)}</span>
                         </div>
                         <Button 
-                          onClick={() => handlePayment(ride.id)}
+                          onClick={() => handleRideDetails(ride.id)}
                           className="w-full md:w-auto"
                         >
-                          <DollarSign size={18} className="mr-2" />
-                          Pagar e Conversar
+                          <MessageCircle size={18} className="mr-2" />
+                          Conversar
                         </Button>
                       </div>
                     </div>
@@ -186,6 +205,24 @@ const RidesList = () => {
           </div>
         )}
       </div>
+      
+      <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Criar carona em {regionName}</DialogTitle>
+          </DialogHeader>
+          <CreateRideForm 
+            onSuccess={() => {
+              setShowCreateModal(false);
+              toast({
+                title: "Carona criada com sucesso",
+                description: "Sua carona foi publicada na região de " + regionName,
+              });
+            }}
+            region={region || ""}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

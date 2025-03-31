@@ -8,7 +8,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { CarFront, Clock, Calendar, MapPin, DollarSign } from "lucide-react";
 
-const CreateRideForm = () => {
+interface CreateRideFormProps {
+  onSuccess?: () => void;
+  region?: string;
+}
+
+const CreateRideForm = ({ onSuccess, region }: CreateRideFormProps) => {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [date, setDate] = useState("");
@@ -38,13 +43,18 @@ const CreateRideForm = () => {
       // Mock API call to create a ride
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      toast({
-        title: "Carona criada!",
-        description: "Sua carona foi criada com sucesso.",
-      });
-      
-      // Navigate to the regions page after successful creation
-      navigate("/regions");
+      // If onSuccess callback is provided, call it
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        toast({
+          title: "Carona criada!",
+          description: "Sua carona foi criada com sucesso.",
+        });
+        
+        // Navigate to the regions page if no callback
+        navigate("/regions");
+      }
     } catch (error) {
       console.error("Ride creation error:", error);
       toast({
