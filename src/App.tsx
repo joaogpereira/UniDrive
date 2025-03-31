@@ -44,7 +44,7 @@ const App = () => (
                 <RidesList />
               </ProtectedRoute>
             } />
-            <Route path="/payment/:rideId" element={
+            <Route path="/ride-details/:rideId" element={
               <ProtectedRoute>
                 <Payment />
               </ProtectedRoute>
