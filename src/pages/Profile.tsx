@@ -8,13 +8,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
-import { ArrowLeft, User, Mail, Car, Calendar, Save } from "lucide-react";
+import CreateRideForm from "@/components/CreateRideForm";
+import { ArrowLeft, User, Mail, Car, Calendar, Save, Plus } from "lucide-react";
 
 const Profile = () => {
   const { user } = useAuth();
   const [name, setName] = useState(user?.name || "");
   const [bio, setBio] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showCreateRide, setShowCreateRide] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -91,63 +93,92 @@ const Profile = () => {
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-1">
-                <Label htmlFor="name">Nome completo</Label>
-                <Input
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Seu nome completo"
-                />
-              </div>
+            {!showCreateRide ? (
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-1">
+                  <Label htmlFor="name">Nome completo</Label>
+                  <Input
+                    id="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Seu nome completo"
+                  />
+                </div>
 
-              <div className="space-y-1">
-                <Label htmlFor="bio">Sobre você</Label>
-                <Textarea
-                  id="bio"
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  placeholder="Conte um pouco sobre você, seus interesses, horários disponíveis, etc."
-                  rows={4}
-                />
-              </div>
+                <div className="space-y-1">
+                  <Label htmlFor="bio">Sobre você</Label>
+                  <Textarea
+                    id="bio"
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    placeholder="Conte um pouco sobre você, seus interesses, horários disponíveis, etc."
+                    rows={4}
+                  />
+                </div>
 
-              {user?.userType === "driver" && (
-                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <h3 className="font-medium text-gray-900 mb-2">Informações de motorista</h3>
-                  <p className="text-gray-600 text-sm mb-4">
-                    Estas informações são visíveis para os passageiros que desejam pegar carona com você.
-                  </p>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <Label htmlFor="carModel">Modelo do carro</Label>
-                      <Input
-                        id="carModel"
-                        placeholder="Ex: Honda Civic 2020"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label htmlFor="licensePlate">Placa do veículo</Label>
-                      <Input
-                        id="licensePlate"
-                        placeholder="Ex: ABC1234"
-                      />
+                {user?.userType === "driver" && (
+                  <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <h3 className="font-medium text-gray-900 mb-2">Informações de motorista</h3>
+                    <p className="text-gray-600 text-sm mb-4">
+                      Estas informações são visíveis para os passageiros que desejam pegar carona com você.
+                    </p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <Label htmlFor="carModel">Modelo do carro</Label>
+                        <Input
+                          id="carModel"
+                          placeholder="Ex: Honda Civic 2020"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label htmlFor="licensePlate">Placa do veículo</Label>
+                        <Input
+                          id="licensePlate"
+                          placeholder="Ex: ABC1234"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-              
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Salvando..." : (
-                  <>
-                    <Save size={18} />
-                    Salvar alterações
-                  </>
                 )}
-              </Button>
-            </form>
+                
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? "Salvando..." : (
+                    <>
+                      <Save size={18} />
+                      Salvar alterações
+                    </>
+                  )}
+                </Button>
+
+                {user?.userType === "driver" && (
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="w-full mt-4"
+                    onClick={() => setShowCreateRide(true)}
+                  >
+                    <Plus size={18} className="mr-2" />
+                    Criar nova carona
+                  </Button>
+                )}
+              </form>
+            ) : (
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-semibold text-gray-900">Criar nova carona</h2>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setShowCreateRide(false)}
+                  >
+                    <ArrowLeft size={16} className="mr-1" />
+                    Voltar ao perfil
+                  </Button>
+                </div>
+                <CreateRideForm />
+              </div>
+            )}
           </div>
         </div>
       </div>

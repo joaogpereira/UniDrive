@@ -12,6 +12,7 @@ import Profile from "./pages/Profile";
 import Regions from "./pages/Regions";
 import RidesList from "./pages/RidesList";
 import RideChat from "./pages/RideChat";
+import Payment from "./pages/Payment";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -41,6 +42,11 @@ const App = () => (
             <Route path="/regions/:region" element={
               <ProtectedRoute>
                 <RidesList />
+              </ProtectedRoute>
+            } />
+            <Route path="/payment/:rideId" element={
+              <ProtectedRoute>
+                <Payment />
               </ProtectedRoute>
             } />
             <Route path="/chat/:rideId" element={

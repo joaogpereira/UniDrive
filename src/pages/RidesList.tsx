@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Clock, User, MapPin, Calendar, ArrowLeft, Car, Star, MessageCircle } from "lucide-react";
+import { Clock, User, MapPin, Calendar, ArrowLeft, Car, Star, MessageCircle, DollarSign } from "lucide-react";
 
 // Mock data for rides
 const mockRides = {
@@ -68,12 +68,12 @@ const RidesList = () => {
     }, 800);
   }, [region]);
   
-  const handleStartChat = (rideId: number) => {
+  const handlePayment = (rideId: number) => {
     toast({
-      title: "Abrindo chat",
-      description: "Você será direcionado para o chat com o motorista e outros passageiros.",
+      title: "Processando pagamento",
+      description: "Você será direcionado para a tela de pagamento.",
     });
-    navigate(`/chat/${rideId}`);
+    navigate(`/payment/${rideId}`);
   };
   
   const regionName = region ? regionNames[region] : "";
@@ -145,11 +145,11 @@ const RidesList = () => {
                           <span className="font-semibold text-unidriver-700">R$ {ride.price.toFixed(2)}</span>
                         </div>
                         <Button 
-                          onClick={() => handleStartChat(ride.id)}
+                          onClick={() => handlePayment(ride.id)}
                           className="w-full md:w-auto"
                         >
-                          <MessageCircle size={18} className="mr-2" />
-                          Conversar
+                          <DollarSign size={18} className="mr-2" />
+                          Pagar e Conversar
                         </Button>
                       </div>
                     </div>
