@@ -46,23 +46,40 @@ const Register = () => {
     setIsLoading(true);
     
     try {
-      await register(name, email, password, userType);
-      toast({
-        title: "Cadastro realizado!",
-        description: "Sua conta foi criada com sucesso.",
-      });
-      navigate("/regions");
-    } catch (error) {
-      console.error("Registration error:", error);
-      toast({
-        title: "Erro no cadastro",
-        description: "Não foi possível criar sua conta. Tente novamente.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const response = await fetch("http://localhost:8000/register", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name,
+      email,
+      password,
+      tipo_usuario: userType, // ou "userType" dependendo do backend
+    }),
+  });
+
+  const data = await response.json();
+
+if (!response.ok) {
+  throw new Error(data || "Erro ao cadastrar");
+}
+
+toast({
+  title: "Cadastro realizado!",
+  description: data, // mostra "OK"
+});
+
+  navigate("/regions");
+
+} catch (error) {
+  console.error("Registration error:", error);
+  toast({
+    title: "Erro no cadastro",
+    description: "Não foi possível criar sua conta. Tente novamente.",
+    variant: "destructive",
+  });
+}}
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-50">
