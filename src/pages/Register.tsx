@@ -15,71 +15,54 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [userType, setUserType] = useState("passenger");
+  const [userType, setUserType] = useState("passageiro");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { register } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!name || !email || !password || !confirmPassword || !userType) {
-      toast({
-        title: "Erro",
-        description: "Por favor, preencha todos os campos.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    if (password !== confirmPassword) {
-      toast({
-        title: "Erro",
-        description: "As senhas não coincidem.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    setIsLoading(true);
-    
-    try {
-  const response = await fetch("http://localhost:8000/register", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name,
-      email,
-      password,
-      tipo_usuario: userType, // ou "userType" dependendo do backend
-    }),
-  });
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-  const data = await response.json();
+  if (!name || !email || !password || !confirmPassword || !userType) {
+    toast({
+      title: "Erro",
+      description: "Por favor, preencha todos os campos.",
+      variant: "destructive",
+    });
+    return;
+  }
 
-if (!response.ok) {
-  throw new Error(data || "Erro ao cadastrar");
-}
+  if (password !== confirmPassword) {
+    toast({
+      title: "Erro",
+      description: "As senhas não coincidem.",
+      variant: "destructive",
+    });
+    return;
+  }
 
-toast({
-  title: "Cadastro realizado!",
-  description: data, // mostra "OK"
-});
+  setIsLoading(true);
 
-  navigate("/regions");
-
-} catch (error) {
-  console.error("Registration error:", error);
+  try {
+  await register(name, email, password, userType); // ✅ do contexto!
   toast({
-    title: "Erro no cadastro",
-    description: "Não foi possível criar sua conta. Tente novamente.",
+    title: "Cadastro realizado!",
+    description: "Bem-vindo!",
+  });
+  navigate("/regions");
+} catch (error) {
+  toast({
+    title: "Erro",
+    description: "Não foi possível cadastrar.",
     variant: "destructive",
   });
-}}
+}finally {
+    setIsLoading(false);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-50">
@@ -164,12 +147,12 @@ toast({
                   className="flex flex-col space-y-2"
                 >
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="passenger" id="passenger" />
-                    <Label htmlFor="passenger" className="cursor-pointer">Passageiro</Label>
+                    <RadioGroupItem value="passageiro" id="passageiro" />
+                    <Label htmlFor="passageiro" className="cursor-pointer">Passageiro</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="driver" id="driver" />
-                    <Label htmlFor="driver" className="cursor-pointer">Motorista</Label>
+                    <RadioGroupItem value="motorista" id="motorista" />
+                    <Label htmlFor="motorista" className="cursor-pointer">Motorista</Label>
                   </div>
                 </RadioGroup>
               </div>
