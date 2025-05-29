@@ -15,6 +15,9 @@ import RideChat from "./pages/RideChat";
 import Payment from "./pages/Payment";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
+import DriverProfile from "./pages/DriverProfile";
+import DriverRegistration from "./pages/DriverRegistration";
+import ManageCars from "./pages/ManageCars";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +55,21 @@ const App = () => (
             <Route path="/chat/:rideId" element={
               <ProtectedRoute>
                 <RideChat />
+              </ProtectedRoute>
+            }/>
+            <Route path="/driver-profile" element={
+              <ProtectedRoute>
+                <DriverProfile />
+              </ProtectedRoute>
+            } />
+            <Route path="/driver-registration" element={
+              <ProtectedRoute>
+                <DriverRegistration />
+              </ProtectedRoute>
+            } />
+            <Route path="/manage-cars" element={
+              <ProtectedRoute>
+                <ManageCars />
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound />} />
