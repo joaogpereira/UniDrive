@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import  {DriverRoutes}  from "./components/ProtectedRoute";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -59,17 +60,22 @@ const App = () => (
             }/>
             <Route path="/driver-profile" element={
               <ProtectedRoute>
+                 <DriverRoutes>
                 <DriverProfile />
+                </DriverRoutes>
               </ProtectedRoute>
+              
             } />
-            <Route path="/driver-registration" element={
+            <Route path="/driver-registration" element={            
               <ProtectedRoute>
                 <DriverRegistration />
               </ProtectedRoute>
             } />
             <Route path="/manage-cars" element={
               <ProtectedRoute>
+                <DriverRoutes>
                 <ManageCars />
+                </DriverRoutes>
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound />} />
