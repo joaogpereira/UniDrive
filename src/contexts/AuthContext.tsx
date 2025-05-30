@@ -4,7 +4,7 @@ interface User {
   id: string;
   name: string;
   email: string;
-  userType: "driver" | "passenger";
+  tipo_usuario: "motorista" | "passageiro";
 }
 
 interface AuthContextType {
@@ -13,7 +13,7 @@ interface AuthContextType {
   token: string | null;
   isLoading: boolean; 
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string, userType: string) => Promise<void>;
+  register: (name: string, email: string, password: string, tipo_usuario: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -39,26 +39,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string) => {
-    const res = await fetch("http://localhost:8000/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    });
+  const res = await fetch("http://localhost:8000/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password }),
+  });
 
-    if (!res.ok) throw new Error("Erro ao fazer login");
+  if (!res.ok) throw new Error("Erro ao fazer login");
 
-    const data = await res.json();
+  const data = await res.json();
 
-    setUser(data.user);
-    setToken(data.token);
-    setIsAuthenticated(true);
-    localStorage.setItem("user", JSON.stringify(data.user));
-    localStorage.setItem("token", data.token);
+  const user = {
+    ...data.user,
+    tipo_usuario: data.user.tipo_usuario,
   };
 
-  const register = async (name: string, email: string, password: string, userType: string) => {
+  setUser(user);
+  setToken(data.token);
+  setIsAuthenticated(true);
+  localStorage.setItem("user", JSON.stringify(user));
+  localStorage.setItem("token", data.token);
+};
+
+
+  const register = async (name: string, email: string, password: string, tipo_usuario: string) => {
   const res = await fetch("http://localhost:8000/register", {
     method: "POST",
     headers: {
@@ -68,7 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       name,
       email,
       password,
-      tipo_usuario: userType,
+      tipo_usuario: tipo_usuario,
     }),
   });
 
@@ -82,12 +88,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     throw new Error("Token ou usuário não retornado pelo backend.");
   }
 
-  setUser(data.user);
+  const user = {
+    ...data.user,
+    tipo_usuario: data.user.tipo_usuario, // ✅ converte para camelCase
+  };
+
+  setUser(user);
   setToken(data.token);
   setIsAuthenticated(true);
-  localStorage.setItem("user", JSON.stringify(data.user));
+  localStorage.setItem("user", JSON.stringify(user));
   localStorage.setItem("token", data.token);
 };
+
 
   const logout = () => {
     setUser(null);
