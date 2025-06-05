@@ -1,11 +1,16 @@
-
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Importa useNavigate
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { LogOut, User } from "lucide-react";
 
 const Navbar = () => {
   const { isAuthenticated, logout, user } = useAuth();
+  const navigate = useNavigate(); // Hook para navegação programática
+
+  // Função de logout
+  const handleLogout = () => {
+    logout(); // Chama o método de logout do contexto
+  };
 
   return (
     <nav className="bg-white shadow-md fixed w-full z-10">
@@ -18,19 +23,24 @@ const Navbar = () => {
               </span>
             </Link>
           </div>
-          
+
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
               <>
-                <Link to="/profile" className="flex items-center gap-2 hover:text-unidriver-600 transition-colors">
+                {/* Link para o perfil, redireciona dependendo do tipo de usuário */}
+                <Link
+                  to={user?.tipo_usuario === 'motorista' ? '/driver-profile' : '/profile'}
+                  className="flex items-center gap-2 hover:text-unidriver-600 transition-colors"
+                >
                   <User size={16} className="text-unidriver-600" />
                   <span className="text-gray-700">{user?.name}</span>
                 </Link>
-                <Button 
-                  variant="ghost" 
+                {/* Botão de logout */}
+                <Button
+                  variant="ghost"
                   size="sm"
                   className="flex items-center gap-1"
-                  onClick={logout}
+                  onClick={handleLogout} // Chama a função de logout
                 >
                   <LogOut size={16} />
                   <span>Sair</span>

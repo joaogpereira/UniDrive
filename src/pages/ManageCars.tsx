@@ -11,16 +11,16 @@ import { toast } from "@/hooks/use-toast";
 
 const ManageCars = () => {
   const [carData, setCarData] = useState({
-    brand: "",
-    model: "",
-    year: "",
-    color: "",
-    plate: "",
+    marca: "",
+    modelo: "",
+    ano: "",
+    cor: "",
+    placa: "",
     renavam: "",
     chassi: "",
-    fuel: "",
-    doors: "",
-    seats: ""
+    combustivel: "",
+    portas: "",
+    assentos: ""
   });
 
   const [documents, setDocuments] = useState({
@@ -39,13 +39,106 @@ const ManageCars = () => {
     setDocuments(prev => ({ ...prev, [field]: file }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  try {
+    const formData = new FormData();
+
+    // Adicionar dados textuais
+    Object.entries(carData).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+
+    // Adicionar arquivos (se tiver)
+    Object.entries(documents).forEach(([key, file]) => {
+      if (file) {
+        let backendFieldName = '';
+        switch (key) {
+          case 'crlvPhoto':
+            backendFieldName = 'crlv';
+            break;
+          case 'insurancePhoto':
+            backendFieldName = 'seguro_veiculo';
+            break;
+          case 'carFrontPhoto':
+            backendFieldName = 'foto_frontal';
+            break;
+          case 'carBackPhoto':
+            backendFieldName = 'foto_traseira';
+            break;
+          case 'carInteriorPhoto':
+            backendFieldName = 'foto_interior';
+            break;
+          default:
+            backendFieldName = key;
+        }
+        formData.append(backendFieldName, file);
+      }
+    });
+    const token = localStorage.getItem('token'); 
+    const response = await fetch('http://localhost:8000/cars', {
+      method: 'POST',
+      headers: {
+    // IMPORTANTE: Não setar 'Content-Type' aqui para FormData,
+    // mas pode setar o Authorization:
+    'Authorization': `Bearer ${token}`
+  },
+      body: formData,
+      credentials: 'include' // caso use cookies para autenticação
+    });
+
+    // Verifica se a resposta tem o content-type JSON antes de tentar ler
+    const contentType = response.headers.get('content-type');
+    let responseData = null;
+    if (contentType && contentType.includes('application/json')) {
+      responseData = await response.json();
+    } else {
+      const text = await response.text();
+      console.error('Resposta inesperada do servidor:', text);
+      throw new Error('Resposta do servidor não é um JSON válido.');
+    }
+
+    if (!response.ok) {
+      throw new Error(responseData?.message || 'Erro ao cadastrar veículo');
+    }
+
     toast({
       title: "Carro cadastrado!",
       description: "Seu veículo foi adicionado e está sendo analisado pela equipe.",
     });
-  };
+
+    // Limpar formulário ou redirecionar se quiser
+    setCarData({
+      marca: "",
+      modelo: "",
+      ano: "",
+      cor: "",
+      placa: "",
+      renavam: "",
+      chassi: "",
+      combustivel: "",
+      portas: "",
+      assentos: ""
+    });
+    setDocuments({
+      crlvPhoto: null,
+      insurancePhoto: null,
+      carFrontPhoto: null,
+      carBackPhoto: null,
+      carInteriorPhoto: null
+    });
+
+  } catch (error: any) {
+    toast({
+      variant: 'destructive',
+      title: 'Erro',
+      description: error.message || 'Algo deu errado.'
+    });
+  }
+};
+
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -73,8 +166,8 @@ const ManageCars = () => {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="brand">Marca *</Label>
-                  <Select onValueChange={(value) => handleInputChange("brand", value)}>
+                  <Label htmlFor="marca">Marca *</Label>
+                  <Select onValueChange={(value) => handleInputChange("marca", value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Selecione a marca" />
                     </SelectTrigger>
@@ -93,11 +186,11 @@ const ManageCars = () => {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="model">Modelo *</Label>
+                  <Label htmlFor="modelo">Modelo *</Label>
                   <Input
-                    id="model"
-                    value={carData.model}
-                    onChange={(e) => handleInputChange("model", e.target.value)}
+                    id="modelo"
+                    value={carData.modelo}
+                    onChange={(e) => handleInputChange("modelo", e.target.value)}
                     placeholder="Ex: Corolla, Civic, Focus"
                     required
                   />
@@ -106,18 +199,18 @@ const ManageCars = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="year">Ano *</Label>
+                  <Label htmlFor="ano">Ano *</Label>
                   <Input
-                    id="year"
-                    value={carData.year}
-                    onChange={(e) => handleInputChange("year", e.target.value)}
+                    id="ano"
+                    value={carData.ano}
+                    onChange={(e) => handleInputChange("ano", e.target.value)}
                     placeholder="Ex: 2020"
                     required
                   />
                 </div>
                 <div>
-                  <Label htmlFor="color">Cor *</Label>
-                  <Select onValueChange={(value) => handleInputChange("color", value)}>
+                  <Label htmlFor="cor">Cor *</Label>
+                  <Select onValueChange={(value) => handleInputChange("cor", value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Cor do veículo" />
                     </SelectTrigger>
@@ -138,11 +231,11 @@ const ManageCars = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="plate">Placa *</Label>
+                  <Label htmlFor="placa">Placa *</Label>
                   <Input
-                    id="plate"
-                    value={carData.plate}
-                    onChange={(e) => handleInputChange("plate", e.target.value)}
+                    id="placa"
+                    value={carData.placa}
+                    onChange={(e) => handleInputChange("placa", e.target.value)}
                     placeholder="ABC-1234"
                     required
                   />
@@ -170,8 +263,8 @@ const ManageCars = () => {
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="fuel">Combustível *</Label>
-                  <Select onValueChange={(value) => handleInputChange("fuel", value)}>
+                  <Label htmlFor="combustivel">Combustível *</Label>
+                  <Select onValueChange={(value) => handleInputChange("combustivel", value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Tipo" />
                     </SelectTrigger>
@@ -187,21 +280,20 @@ const ManageCars = () => {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="doors">Portas *</Label>
-                  <Select onValueChange={(value) => handleInputChange("doors", value)}>
+                  <Label htmlFor="portas">Portas *</Label>
+                  <Select onValueChange={(value) => handleInputChange("portas", value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Qtd" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="2">2 portas</SelectItem>
                       <SelectItem value="4">4 portas</SelectItem>
-                      <SelectItem value="5">5 portas</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="seats">Assentos *</Label>
-                  <Select onValueChange={(value) => handleInputChange("seats", value)}>
+                  <Label htmlFor="assentos">Assentos *</Label>
+                  <Select onValueChange={(value) => handleInputChange("assentos", value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Qtd" />
                     </SelectTrigger>

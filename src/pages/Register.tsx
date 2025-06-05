@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,61 +7,59 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [userType, setUserType] = useState("passageiro");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { register } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  if (!name || !email || !password || !confirmPassword || !userType) {
-    toast({
-      title: "Erro",
-      description: "Por favor, preencha todos os campos.",
-      variant: "destructive",
-    });
-    return;
-  }
+    if (!name || !email || !password || !confirmPassword) {
+      toast({
+        title: "Erro",
+        description: "Por favor, preencha todos os campos.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  if (password !== confirmPassword) {
-    toast({
-      title: "Erro",
-      description: "As senhas não coincidem.",
-      variant: "destructive",
-    });
-    return;
-  }
+    if (password !== confirmPassword) {
+      toast({
+        title: "Erro",
+        description: "As senhas não coincidem.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  setIsLoading(true);
+    setIsLoading(true);
 
-  try {
-  await register(name, email, password, userType); // ✅ do contexto!
-  toast({
-    title: "Cadastro realizado!",
-    description: "Bem-vindo!",
-  });
-  navigate("/regions");
-} catch (error) {
-  toast({
-    title: "Erro",
-    description: "Não foi possível cadastrar.",
-    variant: "destructive",
-  });
-}finally {
-    setIsLoading(false);
-  }
-};
-
+    try {
+      // Definindo o tipo de usuário como "passageiro"
+      await register(name, email, password, "passageiro");
+      toast({
+        title: "Cadastro realizado!",
+        description: "Bem-vindo!",
+      });
+      navigate("/regions"); // Navegar para a página após o cadastro
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Não foi possível cadastrar.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-50">
@@ -71,11 +68,9 @@ const Register = () => {
         <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-lg">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-gray-900">Crie sua conta</h2>
-            <p className="mt-2 text-gray-600">
-              Cadastre-se para começar a usar o Unidriver
-            </p>
+            <p className="mt-2 text-gray-600">Cadastre-se para começar a usar o Unidriver</p>
           </div>
-          
+
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-4">
               <div>
@@ -89,7 +84,7 @@ const Register = () => {
                   required
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -101,7 +96,7 @@ const Register = () => {
                   required
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="password">Senha</Label>
                 <div className="relative">
@@ -118,15 +113,11 @@ const Register = () => {
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? (
-                      <EyeOffIcon size={18} />
-                    ) : (
-                      <EyeIcon size={18} />
-                    )}
+                    {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
                   </button>
                 </div>
               </div>
-              
+
               <div>
                 <Label htmlFor="confirmPassword">Confirmar senha</Label>
                 <Input
@@ -138,34 +129,12 @@ const Register = () => {
                   required
                 />
               </div>
-
-              <div className="space-y-2">
-                <Label>Tipo de usuário</Label>
-                <RadioGroup 
-                  value={userType} 
-                  onValueChange={setUserType}
-                  className="flex flex-col space-y-2"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="passageiro" id="passageiro" />
-                    <Label htmlFor="passageiro" className="cursor-pointer">Passageiro</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="motorista" id="motorista" />
-                    <Label htmlFor="motorista" className="cursor-pointer">Motorista</Label>
-                  </div>
-                </RadioGroup>
-              </div>
             </div>
-            
-            <Button 
-              type="submit" 
-              className="w-full py-6"
-              disabled={isLoading}
-            >
+
+            <Button type="submit" className="w-full py-6" disabled={isLoading}>
               {isLoading ? "Processando..." : "Criar conta"}
             </Button>
-            
+
             <div className="text-center">
               <p className="text-sm text-gray-600">
                 Já tem uma conta?{" "}

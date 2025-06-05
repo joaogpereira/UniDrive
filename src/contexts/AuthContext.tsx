@@ -42,29 +42,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string) => {
-  const res = await fetch("http://localhost:8000/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email, password }),
-  });
+  try {
+    // Envia a requisição para o backend
+    const res = await fetch("http://localhost:8000/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
-  if (!res.ok) throw new Error("Erro ao fazer login");
+    // Verifica se a resposta foi bem-sucedida
+    if (!res.ok) throw new Error("Erro ao fazer login");
 
-  const data = await res.json();
+    // Obtém os dados da resposta
+    const data = await res.json();
 
-  const user = {
-    ...data.user,
-    tipo_usuario: data.user.tipo_usuario,
-  };
+    // Cria o objeto de usuário
+    const user = {
+      ...data.user,
+      tipo_usuario: data.user.tipo_usuario,
+    };
 
-  setUser(user);
-  setToken(data.token);
-  setIsAuthenticated(true);
-  localStorage.setItem("user", JSON.stringify(user));
-  localStorage.setItem("token", data.token);
+    // Verifica se o usuário tem um perfil de motorista
+    const Driver = data.driver_profile || null; // Garantir que driver seja null se não existir
+
+    // Define os estados com os dados recebidos
+    setUser(user);
+    setToken(data.token);
+    setIsAuthenticated(true);
+
+    // Salva os dados no localStorage
+    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("driver", JSON.stringify(Driver)); // Pode ser null ou os dados do motorista
+    localStorage.setItem("token", data.token);
+
+    console.log("Login realizado com sucesso");
+  } catch (error) {
+    console.error("Erro ao realizar login:", error);
+  }
 };
+
 
 
   const register = async (name: string, email: string, password: string, tipo_usuario: string) => {

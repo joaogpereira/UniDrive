@@ -1,39 +1,60 @@
-
-import { useState } from "react";
-import { ArrowLeft, Upload, User } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ArrowLeft, Upload } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 
 const DriverRegistration = () => {
   const [formData, setFormData] = useState({
-    fullName: "",
+    nome_completo: "",
     email: "",
-    phone: "",
+    telefone: "",
     cpf: "",
-    birthDate: "",
-    address: "",
-    university: "",
-    course: "",
-    studentId: "",
+    data_nascimento: "",
+    endereco: "",
+    faculdade: "",
+    curso: "",
+    matricula: "",
     cnh: "",
-    cnhCategory: "",
-    emergencyContact: "",
-    emergencyPhone: ""
+    categoria_cnh: "",
+    nome_contato_emergencia: "",
+    telefone_contato_emergencia: ""
   });
 
   const [documents, setDocuments] = useState({
-    identityPhoto: null,
-    criminalRecord: null,
-    universityProof: null,
-    cnhPhoto: null,
-    profilePhoto: null
+    foto_rg: null,
+    registro_criminal: null,
+    comprovante_academico: null,
+    foto_cnh: null,
+    foto_perfil: null
   });
+
+  // Carregar dados do localStorage quando o componente for montado
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("user"));
+    
+    if (userData) {
+      setFormData({
+        nome_completo: userData.name || "",
+        email: userData.email || "",
+        telefone: "", // Se houver no localStorage, adicione esses dados
+        cpf: "", 
+        data_nascimento: "", // Se houver no localStorage
+        endereco: "", 
+        faculdade: "", 
+        curso: "", 
+        matricula: "", 
+        cnh: "", 
+        categoria_cnh: "", 
+        nome_contato_emergencia: "", 
+        telefone_contato_emergencia: ""
+      });
+    }
+  }, []);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -45,15 +66,81 @@ const DriverRegistration = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // Verifique se o campo endereco não está vazio antes de enviar
+  if (!formData.endereco) {
+    console.log("Campo endereco está vazio!");
     toast({
-      title: "Cadastro enviado!",
-      description: "Seus documentos estão sendo analisados. Você receberá uma resposta em até 48h.",
+      title: "Erro",
+      description: "O campo de endereço é obrigatório.",
     });
+    return; // Impede o envio do formulário
+  }
+
+    // Logs das etapas da requisição
+    console.log("Iniciando o envio dos dados...");
+    console.log("Dados do formulário:", formData);
+    console.log("Documentos:", documents);
+
+    // Preparar os dados para enviar para o backend
+    const formDataToSend = {
+      ...formData,
+      documents: {
+        foto_rg: documents.foto_rg,
+        registro_criminal: documents.registro_criminal,
+        comprovante_academico: documents.comprovante_academico,
+        foto_cnh: documents.foto_cnh,
+        foto_perfil: documents.foto_perfil
+      }
+    };
+
+    console.log("Dados a serem enviados para o backend:", formDataToSend);
+
+    // Enviar dados para o backend
+    fetch("http://localhost:8000/driver/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formDataToSend),
+    })
+      .then((response) => {
+        console.log("Resposta do servidor:", response);
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Dados recebidos do servidor:", data);
+        if (data.success) {
+            // Atualiza o tipo de usuário e os dados do motorista no localStorage
+            const user = JSON.parse(localStorage.getItem('user')) || {};
+            user.tipo_usuario = 'motorista'; // Atualiza o tipo de usuário
+            user.driver_data = data.data; // Adiciona os dados do motorista ao localStorage
+
+            // Salva a nova estrutura no localStorage
+            localStorage.setItem('user', JSON.stringify(user));
+
+            // Exibe o toast de sucesso
+            toast({
+                title: "Cadastro enviado!",
+                description: "Seus documentos estão sendo analisados. Você receberá uma resposta em até 48h.",
+            });
+        } else {
+          toast({
+            title: "Erro",
+            description: data.message || "Ocorreu um erro. Tente novamente.",
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("Erro de rede:", error);
+        toast({
+          title: "Erro de rede",
+          description: "Não foi possível se conectar ao servidor. Verifique sua conexão.",
+        });
+      });
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <div className="bg-white border-b px-4 py-3 flex items-center gap-3">
         <Link to="/">
           <Button variant="ghost" size="sm">
@@ -74,11 +161,11 @@ const DriverRegistration = () => {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="fullName">Nome completo *</Label>
+                  <Label htmlFor="nome_completo">Nome completo *</Label>
                   <Input
-                    id="fullName"
-                    value={formData.fullName}
-                    onChange={(e) => handleInputChange("fullName", e.target.value)}
+                    id="nome_completo"
+                    value={formData.nome_completo}
+                    onChange={(e) => handleInputChange("nome_completo", e.target.value)}
                     required
                   />
                 </div>
@@ -93,14 +180,14 @@ const DriverRegistration = () => {
                   />
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="phone">Telefone *</Label>
+                  <Label htmlFor="telefone">Telefone *</Label>
                   <Input
-                    id="phone"
-                    value={formData.phone}
-                    onChange={(e) => handleInputChange("phone", e.target.value)}
+                    id="telefone"
+                    value={formData.telefone}
+                    onChange={(e) => handleInputChange("telefone", e.target.value)}
                     placeholder="(XX) XXXXX-XXXX"
                     required
                   />
@@ -119,21 +206,21 @@ const DriverRegistration = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="birthDate">Data de nascimento *</Label>
+                  <Label htmlFor="data_nascimento">Data de nascimento *</Label>
                   <Input
-                    id="birthDate"
+                    id="data_nascimento"
                     type="date"
-                    value={formData.birthDate}
-                    onChange={(e) => handleInputChange("birthDate", e.target.value)}
+                    value={formData.data_nascimento}
+                    onChange={(e) => handleInputChange("data_nascimento", e.target.value)}
                     required
                   />
                 </div>
                 <div>
-                  <Label htmlFor="address">Endereço completo *</Label>
+                  <Label htmlFor="endereco">Endereço completo *</Label>
                   <Input
-                    id="address"
-                    value={formData.address}
-                    onChange={(e) => handleInputChange("address", e.target.value)}
+                    id="endereco"
+                    value={formData.endereco}
+                    onChange={(e) => handleInputChange("endereco", e.target.value)}
                     required
                   />
                 </div>
@@ -148,8 +235,8 @@ const DriverRegistration = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="university">Universidade/Faculdade *</Label>
-                <Select onValueChange={(value) => handleInputChange("university", value)}>
+                <Label htmlFor="faculdade">Universidade/Faculdade *</Label>
+                <Select onValueChange={(value) => handleInputChange("faculdade", value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione sua instituição" />
                   </SelectTrigger>
@@ -166,21 +253,21 @@ const DriverRegistration = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="course">Curso *</Label>
+                  <Label htmlFor="curso">Curso *</Label>
                   <Input
-                    id="course"
-                    value={formData.course}
-                    onChange={(e) => handleInputChange("course", e.target.value)}
+                    id="curso"
+                    value={formData.curso}
+                    onChange={(e) => handleInputChange("curso", e.target.value)}
                     placeholder="Ex: Engenharia Civil"
                     required
                   />
                 </div>
                 <div>
-                  <Label htmlFor="studentId">Matrícula *</Label>
+                  <Label htmlFor="matricula">Matrícula *</Label>
                   <Input
-                    id="studentId"
-                    value={formData.studentId}
-                    onChange={(e) => handleInputChange("studentId", e.target.value)}
+                    id="matricula"
+                    value={formData.matricula}
+                    onChange={(e) => handleInputChange("matricula", e.target.value)}
                     required
                   />
                 </div>
@@ -205,8 +292,8 @@ const DriverRegistration = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="cnhCategory">Categoria *</Label>
-                  <Select onValueChange={(value) => handleInputChange("cnhCategory", value)}>
+                  <Label htmlFor="categoria_cnh">Categoria *</Label>
+                  <Select onValueChange={(value) => handleInputChange("categoria_cnh", value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Categoria" />
                     </SelectTrigger>
@@ -232,20 +319,20 @@ const DriverRegistration = () => {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="emergencyContact">Nome do contato *</Label>
+                  <Label htmlFor="nome_contato_emergencia">Nome do contato *</Label>
                   <Input
-                    id="emergencyContact"
-                    value={formData.emergencyContact}
-                    onChange={(e) => handleInputChange("emergencyContact", e.target.value)}
+                    id="nome_contato_emergencia"
+                    value={formData.nome_contato_emergencia}
+                    onChange={(e) => handleInputChange("nome_contato_emergencia", e.target.value)}
                     required
                   />
                 </div>
                 <div>
-                  <Label htmlFor="emergencyPhone">Telefone *</Label>
+                  <Label htmlFor="telefone_contato_emergencia">Telefone *</Label>
                   <Input
-                    id="emergencyPhone"
-                    value={formData.emergencyPhone}
-                    onChange={(e) => handleInputChange("emergencyPhone", e.target.value)}
+                    id="telefone_contato_emergencia"
+                    value={formData.telefone_contato_emergencia}
+                    onChange={(e) => handleInputChange("telefone_contato_emergencia", e.target.value)}
                     placeholder="(XX) XXXXX-XXXX"
                     required
                   />
@@ -260,77 +347,7 @@ const DriverRegistration = () => {
               <CardTitle>Documentos Obrigatórios</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 gap-4">
-                <div>
-                  <Label>Foto do perfil *</Label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                    <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                    <p className="text-sm text-gray-600">Clique para enviar sua foto</p>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => handleFileUpload("profilePhoto", e.target.files?.[0] || null)}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label>Foto da identidade (RG) *</Label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                    <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                    <p className="text-sm text-gray-600">Foto clara da frente do RG</p>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => handleFileUpload("identityPhoto", e.target.files?.[0] || null)}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label>Registro criminal *</Label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                    <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                    <p className="text-sm text-gray-600">Certidão de antecedentes criminais</p>
-                    <input
-                      type="file"
-                      accept="image/*,.pdf"
-                      className="hidden"
-                      onChange={(e) => handleFileUpload("criminalRecord", e.target.files?.[0] || null)}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label>Comprovante acadêmico *</Label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                    <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                    <p className="text-sm text-gray-600">Declaração de matrícula ou carteirinha estudantil</p>
-                    <input
-                      type="file"
-                      accept="image/*,.pdf"
-                      className="hidden"
-                      onChange={(e) => handleFileUpload("universityProof", e.target.files?.[0] || null)}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label>Foto da CNH *</Label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                    <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                    <p className="text-sm text-gray-600">Foto da frente da CNH</p>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => handleFileUpload("cnhPhoto", e.target.files?.[0] || null)}
-                    />
-                  </div>
-                </div>
-              </div>
+              {/* Campos para upload de documentos */}
             </CardContent>
           </Card>
 
@@ -342,5 +359,6 @@ const DriverRegistration = () => {
     </div>
   );
 };
+
 
 export default DriverRegistration;
