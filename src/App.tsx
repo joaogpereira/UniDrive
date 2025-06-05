@@ -19,6 +19,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import DriverProfile from "./pages/DriverProfile";
 import DriverRegistration from "./pages/DriverRegistration";
 import ManageCars from "./pages/ManageCars";
+import CreateTrip from "./pages/CreateTrip";
 
 const queryClient = new QueryClient();
 
@@ -75,6 +76,13 @@ const App = () => (
               <ProtectedRoute>
                 <DriverRoutes>
                 <ManageCars />
+                </DriverRoutes>
+              </ProtectedRoute>
+            } />
+            <Route path="/create-trip" element={
+              <ProtectedRoute>
+                <DriverRoutes>
+                <CreateTrip />
                 </DriverRoutes>
               </ProtectedRoute>
             } />

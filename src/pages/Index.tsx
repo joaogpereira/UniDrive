@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -7,7 +6,9 @@ import { motion } from "framer-motion";
 import { ArrowRight, Car } from "lucide-react";
 
 const Index = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();  // Aqui obtemos o usuário autenticado e seus dados
+
+  const isDriver = user?.tipo_usuario === 'motorista'; // Verifica se o usuário é motorista
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-50">
@@ -34,12 +35,22 @@ const Index = () => {
             transition={{ delay: 0.3, duration: 0.5 }}
           >
             {isAuthenticated ? (
-              <Button asChild size="lg" className="px-8 py-6 text-lg">
-                <Link to="/regions">
-                  <span>Encontrar Caronas</span>
-                  <ArrowRight className="ml-2" size={20} />
-                </Link>
-              </Button>
+              <>
+                <Button asChild size="lg" className="px-8 py-6 text-lg">
+                  <Link to="/regions">
+                    <span>Encontrar Caronas</span>
+                    <ArrowRight className="ml-2" size={20} />
+                  </Link>
+                </Button>
+                {isDriver && (
+                  <Button asChild size="lg" className="px-8 py-6 text-lg">
+                    <Link to="/create-trip">
+                      <span>Crie uma nova viagem</span>
+                      <ArrowRight className="ml-2" size={20} />
+                    </Link>
+                  </Button>
+                )}
+              </>
             ) : (
               <>
                 <Button asChild size="lg" className="px-8 py-6 text-lg">
