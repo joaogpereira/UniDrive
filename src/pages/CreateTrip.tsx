@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, MapPin, Clock, Car, Fuel, Calculator } from "lucide-react";
 import { Link } from "react-router-dom";
-import Navbar from "@/components/Navbar"; // Importando a Navbar
+import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,23 +22,13 @@ const CreateTrip = () => {
     maxPassengers: "",
     pricePerPassenger: "",
     description: "",
-    fuelType: "",  // Novo estado para o tipo de combustível
+    fuelType: "",
   });
 
-  // Dados fictícios dos carros do motorista
-  const userCars = [
-    { id: "1", brand: "Toyota", model: "Corolla", year: "2020", plate: "ABC-1234" },
-    { id: "2", brand: "Honda", model: "Civic", year: "2021", plate: "XYZ-5678" }
-  ];
+  const [userCars, setUserCars] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Lista de tipos de combustível
-  const fuelTypes = [
-    "Gasolina Comum",
-    "Podium",
-    "Etanol",
-    "Diesel",
-    "GNV"
-  ];
+  const fuelTypes = ["Gasolina Comum", "Podium", "Etanol", "Diesel", "GNV"];
 
   const handleInputChange = (field: string, value: string) => {
     setTripData(prev => ({ ...prev, [field]: value }));
@@ -47,7 +37,6 @@ const CreateTrip = () => {
   const calculateEstimatedCost = () => {
     const { fuelPrice, carConsumption } = tripData;
     if (fuelPrice && carConsumption) {
-      // Estimativa básica para 100km
       const estimatedDistance = 100;
       const fuelNeeded = estimatedDistance / parseFloat(carConsumption);
       const totalCost = fuelNeeded * parseFloat(fuelPrice);
@@ -64,14 +53,43 @@ const CreateTrip = () => {
     });
   };
 
+  useEffect(() => {
+    const fetchCars = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const response = await fetch("http://localhost:8000/user/cars", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Falha ao buscar carros do usuário");
+        }
+
+        const data = await response.json();
+        setUserCars(data);
+      } catch (error) {
+        console.error(error);
+        toast({
+          title: "Erro ao carregar veículos",
+          description: "Verifique sua conexão ou tente novamente mais tarde.",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCars();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navbar com a classe fixed */}
       <Navbar />
-
-      <div className="max-w-2xl mx-auto p-6 pt-20"> {/* Adicionei `pt-20` para garantir que o conteúdo não seja sobreposto */}
+      <div className="max-w-2xl mx-auto p-6 pt-20">
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Seleção do Veículo */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -82,23 +100,26 @@ const CreateTrip = () => {
             <CardContent>
               <div>
                 <Label htmlFor="car">Escolha seu veículo *</Label>
-                <Select onValueChange={(value) => handleInputChange("carId", value)} required>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione o carro para a viagem" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {userCars.map((car) => (
-                      <SelectItem key={car.id} value={car.id}>
-                        {car.brand} {car.model} {car.year} - {car.plate}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {loading ? (
+                  <p>Carregando veículos...</p>
+                ) : (
+                  <Select onValueChange={(value) => handleInputChange("carId", value)} required>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o carro para a viagem" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {userCars.map((car) => (
+                        <SelectItem key={car.id} value={String(car.id)}>
+                          {car.brand} {car.model} {car.year} - {car.plate}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
             </CardContent>
           </Card>
 
-          {/* Informações da Rota */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -117,7 +138,6 @@ const CreateTrip = () => {
                   required
                 />
               </div>
-
               <div>
                 <Label htmlFor="destination">Local de Destino *</Label>
                 <Input
@@ -131,7 +151,6 @@ const CreateTrip = () => {
             </CardContent>
           </Card>
 
-          {/* Data e Hora */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -166,7 +185,6 @@ const CreateTrip = () => {
             </CardContent>
           </Card>
 
-          {/* Custos e Consumo */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -232,26 +250,25 @@ const CreateTrip = () => {
             </CardContent>
           </Card>
 
-          {/* Configurações da Viagem */}
           <Card>
             <CardHeader>
               <CardTitle>Configurações da Viagem</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="maxPassengers">Máximo de Passageiros *</Label>
-                  <Select onValueChange={(value) => handleInputChange("maxPassengers", value)} required>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Vagas" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">1 passageiro</SelectItem>
-                      <SelectItem value="2">2 passageiros</SelectItem>
-                      <SelectItem value="3">3 passageiros</SelectItem>
-                      <SelectItem value="4">4 passageiros</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div>
+                <Label htmlFor="maxPassengers">Máximo de Passageiros *</Label>
+                <Select onValueChange={(value) => handleInputChange("maxPassengers", value)} required>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Vagas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">1 passageiro</SelectItem>
+                    <SelectItem value="2">2 passageiros</SelectItem>
+                    <SelectItem value="3">3 passageiros</SelectItem>
+                    <SelectItem value="4">4 passageiros</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
               <div>
                 <Label htmlFor="description">Observações (Opcional)</Label>
