@@ -9,6 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
+import { PlacesAutocomplete } from "@/components/PlacesAutocomplete";
+
 
 const CreateTrip = () => {
   const [tripData, setTripData] = useState({
@@ -71,6 +73,7 @@ const CreateTrip = () => {
 
         const data = await response.json();
         setUserCars(data);
+        console.log(data)
       } catch (error) {
         console.error(error);
         toast({
@@ -110,7 +113,7 @@ const CreateTrip = () => {
                     <SelectContent>
                       {userCars.map((car) => (
                         <SelectItem key={car.id} value={String(car.id)}>
-                          {car.brand} {car.model} {car.year} - {car.plate}
+                          {car.marca} {car.modelo} {car.ano} - {car.placa}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -130,22 +133,20 @@ const CreateTrip = () => {
             <CardContent className="space-y-4">
               <div>
                 <Label htmlFor="origin">Local de Saída *</Label>
-                <Input
+                <PlacesAutocomplete
                   id="origin"
                   value={tripData.originAddress}
-                  onChange={(e) => handleInputChange("originAddress", e.target.value)}
+                  onChange={(val) => handleInputChange("originAddress", val)}
                   placeholder="Ex: Rua das Flores, 123 - Centro, São Paulo"
-                  required
                 />
               </div>
               <div>
                 <Label htmlFor="destination">Local de Destino *</Label>
-                <Input
+                <PlacesAutocomplete
                   id="destination"
                   value={tripData.destinationAddress}
-                  onChange={(e) => handleInputChange("destinationAddress", e.target.value)}
+                  onChange={(val) => handleInputChange("destinationAddress", val)}
                   placeholder="Ex: Av. Paulista, 1000 - Bela Vista, São Paulo"
-                  required
                 />
               </div>
             </CardContent>
