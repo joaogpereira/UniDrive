@@ -49,7 +49,7 @@ const Register = () => {
         title: "Cadastro realizado!",
         description: "Bem-vindo!",
       });
-      navigate("/regions"); // Navegar para a página após o cadastro
+      navigate("/"); // Navegar para a página após o cadastro
     } catch (error) {
       toast({
         title: "Erro",
