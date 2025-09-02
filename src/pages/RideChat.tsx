@@ -54,7 +54,7 @@ const RideChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [ride, setRide] = useState<any>(null);
-  const { user } = useAuth();
+  const { user, isDriver } = useAuth();
   const { toast } = useToast();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -116,7 +116,7 @@ const RideChat = () => {
       senderId: user?.id || "user-id",
       content: newMessage,
       timestamp: new Date(),
-      isDriver: user?.userType === "driver",
+      isDriver: isDriver,
     };
 
     setMessages([...messages, message]);

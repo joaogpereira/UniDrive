@@ -40,7 +40,7 @@ const RidesList = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isDriver } = useAuth();
 
   useEffect(() => {
     const fetchRides = async () => {
@@ -80,7 +80,6 @@ const RidesList = () => {
   };
 
   const regionName = region ? regionNames[region] : "";
-  const isDriver = user?.userType === "driver";
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-50">
