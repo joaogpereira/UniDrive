@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import  {DriverRoutes}  from "./components/ProtectedRoute";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -15,6 +16,10 @@ import RideChat from "./pages/RideChat";
 import Payment from "./pages/Payment";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
+import DriverProfile from "./pages/DriverProfile";
+import DriverRegistration from "./pages/DriverRegistration";
+import ManageCars from "./pages/ManageCars";
+import CreateTrip from "./pages/CreateTrip";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +57,33 @@ const App = () => (
             <Route path="/chat/:rideId" element={
               <ProtectedRoute>
                 <RideChat />
+              </ProtectedRoute>
+            }/>
+            <Route path="/driver-profile" element={
+              <ProtectedRoute>
+                 <DriverRoutes>
+                <DriverProfile />
+                </DriverRoutes>
+              </ProtectedRoute>
+              
+            } />
+            <Route path="/driver-registration" element={            
+              <ProtectedRoute>
+                <DriverRegistration />
+              </ProtectedRoute>
+            } />
+            <Route path="/manage-cars" element={
+              <ProtectedRoute>
+                <DriverRoutes>
+                <ManageCars />
+                </DriverRoutes>
+              </ProtectedRoute>
+            } />
+            <Route path="/create-trip" element={
+              <ProtectedRoute>
+                <DriverRoutes>
+                <CreateTrip />
+                </DriverRoutes>
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound />} />
