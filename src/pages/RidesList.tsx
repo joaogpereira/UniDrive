@@ -50,15 +50,16 @@ const RidesList = () => {
         const data = await response.json();
 
         // filtra por região se precisar
-        const filteredRides = region
-          ? data.filter(
-              (ride: any) =>
-                ride.local_saida.toLowerCase().includes(region.toLowerCase()) ||
-                ride.local_destino.toLowerCase().includes(region.toLowerCase())
-            )
-          : data;
+        // const filteredRides = region
+        //   ? data.filter(
+        //       (ride: any) =>
+        //         ride.local_saida.toLowerCase().includes(region.toLowerCase()) ||
+        //         ride.local_destino.toLowerCase().includes(region.toLowerCase())
+        //     )
+        //   : data;
 
-        setRides(filteredRides);
+        // setRides(filteredRides);
+        setRides(data);
       } catch (err) {
         console.error(err);
         setRides([]);
@@ -179,7 +180,7 @@ const RidesList = () => {
                       <div className="flex flex-col items-start md:items-end">
                         <div className="bg-gray-100 px-4 py-2 rounded-full mb-3">
                           <span className="font-semibold text-unidriver-700">
-                            R$ {ride.preco_gasolina.toFixed(2)}
+                            R$ {Number(ride.preco_gasolina).toFixed(2)}
                           </span>
                         </div>
                         <Button
