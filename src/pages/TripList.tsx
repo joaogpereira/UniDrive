@@ -158,11 +158,15 @@ const RidesList = () => {
                         <div className="flex flex-wrap gap-4 mt-4">
                           <div className="flex items-center text-gray-600">
                             <Calendar size={16} className="mr-1" />
-                            <span>{ride.data_partida}</span>
+                            <span>
+                              {new Date(ride.data_partida).toLocaleDateString(
+                                "pt-br"
+                              )}
+                            </span>
                           </div>
                           <div className="flex items-center text-gray-600">
                             <Clock size={16} className="mr-1" />
-                            <span>{ride.hora_de_partida}</span>
+                            <span>{ride.hora_de_partida.slice(0, 5)}</span>
                           </div>
                           <div className="flex items-center text-gray-600">
                             <User size={16} className="mr-1" />
@@ -199,7 +203,7 @@ const RidesList = () => {
                         </div>
                         <div>
                           <p className="font-medium text-gray-900">
-                            {ride.driver?.name}
+                            {ride.driver?.user?.name || "Motorista"}
                           </p>
                         </div>
                       </div>
