@@ -46,19 +46,10 @@ const RidesList = () => {
     const fetchRides = async () => {
       setLoading(true);
       try {
-        const response = await fetch("http://127.0.0.1:8000/trips"); // ajuste se seu backend tiver outra URL
+        const response = await fetch(
+          `http://127.0.0.1:8000/trips?region=${region || ""}`
+        ); // ajuste se seu backend tiver outra URL
         const data = await response.json();
-
-        // filtra por região se precisar
-        // const filteredRides = region
-        //   ? data.filter(
-        //       (ride: any) =>
-        //         ride.local_saida.toLowerCase().includes(region.toLowerCase()) ||
-        //         ride.local_destino.toLowerCase().includes(region.toLowerCase())
-        //     )
-        //   : data;
-
-        // setRides(filteredRides);
         setRides(data);
       } catch (err) {
         console.error(err);
@@ -171,8 +162,8 @@ const RidesList = () => {
                           <div className="flex items-center text-gray-600">
                             <User size={16} className="mr-1" />
                             <span>
-                              {ride.qntd_passageiros}{" "}
-                              {ride.qntd_passageiros === 1
+                              {ride.vagas_disponiveis}{" "}
+                              {ride.vagas_disponiveis === 1
                                 ? "lugar"
                                 : "lugares"}
                             </span>
