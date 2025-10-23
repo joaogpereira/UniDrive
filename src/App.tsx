@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { DriverRoutes } from "./components/ProtectedRoute";
 import Index from "./pages/Index";
@@ -19,7 +19,12 @@ import DriverProfile from "./pages/DriverProfile";
 import DriverRegistration from "./pages/DriverRegistration";
 import ManageCars from "./pages/ManageCars";
 import CreateTrip from "./pages/CreateTrip";
+
+// 🟩 Admin Pages
 import LoginAdmin from "./pages/AdminPages/Login";
+import Dashboard from "./pages/AdminPages/Dashboard";
+import UsersList from "./pages/AdminPages/UsersList";
+import PendingUsers from "./pages/AdminPages/PendingUsers";
 
 const queryClient = new QueryClient();
 
@@ -31,10 +36,18 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
+            {/* 🌎 Rotas públicas */}
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/loginadmin" element={<LoginAdmin/>} />
+
+            {/* 🟩 Rotas administrativas */}
+            <Route path="/loginadmin" element={<LoginAdmin />} />
+            <Route path="/admin" element={<Dashboard />} />
+            <Route path="/admin/users" element={<UsersList />} />
+            <Route path="/admin/pending" element={<PendingUsers />} />
+
+            {/* 🔒 Rotas protegidas de usuário */}
             <Route
               path="/profile"
               element={
@@ -113,6 +126,8 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+
+            {/* 404 */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
