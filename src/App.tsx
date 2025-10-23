@@ -19,6 +19,7 @@ import DriverProfile from "./pages/DriverProfile";
 import DriverRegistration from "./pages/DriverRegistration";
 import ManageCars from "./pages/ManageCars";
 import CreateTrip from "./pages/CreateTrip";
+import LoginAdmin from "./pages/AdminPages/Login";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/loginadmin" element={<LoginAdmin/>} />
             <Route
               path="/profile"
               element={
