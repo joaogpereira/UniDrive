@@ -55,7 +55,7 @@ const Login = () => {
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-50">
       <Navbar />
       <div className="pt-20 pb-10 flex items-center justify-center">
-        <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-lg">
+        <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-lg mt-10">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-gray-900">Entre na sua conta</h2>
             <p className="mt-2 text-gray-600">

@@ -38,7 +38,7 @@ export default function Dashboard() {
             <Car className="text-green-400" size={28} />
             <div>
               <p className="text-gray-400 text-sm">Corridas Pedidas</p>
-              <p className="text-2xl font-bold">{stats.totalRides}</p>
+              <p className="text-2xl font-bold text-white">{stats.totalRides}</p>
             </div>
           </CardContent>
         </Card>
@@ -48,7 +48,7 @@ export default function Dashboard() {
             <Users className="text-green-400" size={28} />
             <div>
               <p className="text-gray-400 text-sm">Usuários Cadastrados</p>
-              <p className="text-2xl font-bold">{stats.totalUsers}</p>
+              <p className="text-2xl font-bold text-white">{stats.totalUsers}</p>
             </div>
           </CardContent>
         </Card>
@@ -58,7 +58,7 @@ export default function Dashboard() {
             <ShieldCheck className="text-green-400" size={28} />
             <div>
               <p className="text-gray-400 text-sm">Administradores</p>
-              <p className="text-2xl font-bold">{stats.admins}</p>
+              <p className="text-2xl font-bold text-white">{stats.admins}</p>
             </div>
           </CardContent>
         </Card>
