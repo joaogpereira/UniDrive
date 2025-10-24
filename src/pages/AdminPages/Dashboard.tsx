@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Users, Car, ShieldCheck } from "lucide-react";
-import AdminLayout from "./components/AdminLayout";
+import AdminLayout from "./componentes/AdminLayout";
 import {
   LineChart,
   Line,

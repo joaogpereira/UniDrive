@@ -24,7 +24,7 @@ import CreateTrip from "./pages/CreateTrip";
 import LoginAdmin from "./pages/AdminPages/Login";
 import Dashboard from "./pages/AdminPages/Dashboard";
 import UsersList from "./pages/AdminPages/UsersList";
-import PendingUsers from "./pages/AdminPages/PendingUsers";
+import Pendingusers from "./pages/AdminPages/Pendingusers"; 
 
 const queryClient = new QueryClient();
 
@@ -45,7 +45,7 @@ const App = () => (
             <Route path="/loginadmin" element={<LoginAdmin />} />
             <Route path="/admin" element={<Dashboard />} />
             <Route path="/admin/users" element={<UsersList />} />
-            <Route path="/admin/pending" element={<PendingUsers />} />
+            <Route path="/admin/pending" element={<Pendingusers />} />
 
             {/* 🔒 Rotas protegidas de usuário */}
             <Route

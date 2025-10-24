@@ -1,6 +1,6 @@
 // src/pages/Admin/UsersList.tsx
 import { useState } from "react";
-import AdminLayout from "./components/AdminLayout";
+import AdminLayout from "./componentes/AdminLayout";
 
 export default function UsersList() {
   const [users] = useState(

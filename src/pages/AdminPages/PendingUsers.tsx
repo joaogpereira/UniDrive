@@ -1,5 +1,5 @@
 // src/pages/Admin/PendingUsers.tsx
-import AdminLayout from "./components/AdminLayout";
+import AdminLayout from "./componentes/AdminLayout";
 
 export default function PendingUsers() {
   const pending = [
