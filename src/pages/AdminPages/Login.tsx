@@ -36,7 +36,7 @@ const Login = () => {
         title: "Sucesso!",
         description: "Login realizado com sucesso.",
       });
-      navigate("/");
+      navigate("/regions");
     } catch (error) {
       console.error("Login error:", error);
       toast({

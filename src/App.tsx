@@ -24,7 +24,7 @@ import CreateTrip from "./pages/CreateTrip";
 import LoginAdmin from "./pages/AdminPages/Login";
 import Dashboard from "./pages/AdminPages/Dashboard";
 import UsersList from "./pages/AdminPages/UsersList";
-import Pendingusers from "./pages/AdminPages/Pendingusers"; 
+import Pendingusers from "./pages/AdminPages/PendingUsers"; 
 
 const queryClient = new QueryClient();
 
