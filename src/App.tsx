@@ -5,36 +5,46 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { DriverRoutes } from "./components/ProtectedRoute";
+
+// 🌎 Páginas públicas
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+
+// 🔒 Páginas protegidas (usuário)
 import Profile from "./pages/Profile";
 import Regions from "./pages/Regions";
 import RidesList from "./pages/TripList";
 import RideChat from "./pages/TripChat";
 import Payment from "./pages/Payment";
-import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
+
+// 🚗 Páginas de motorista
 import DriverProfile from "./pages/DriverProfile";
 import DriverRegistration from "./pages/DriverRegistration";
 import ManageCars from "./pages/ManageCars";
 import CreateTrip from "./pages/CreateTrip";
 
-// 🟩 Admin Pages
+// 🟩 Páginas administrativas
 import LoginAdmin from "./pages/AdminPages/Login";
 import Dashboard from "./pages/AdminPages/Dashboard";
 import UsersList from "./pages/AdminPages/UsersList";
-import Pendingusers from "./pages/AdminPages/PendingUsers"; 
+import Pendingusers from "./pages/AdminPages/PendingUsers";
+
+// ❌ Página 404
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
+    {/* ✅ O BrowserRouter agora envolve TODO o app */}
+    <BrowserRouter>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+
           <Routes>
             {/* 🌎 Rotas públicas */}
             <Route path="/" element={<Index />} />
@@ -88,6 +98,8 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+
+            {/* 🚗 Rotas exclusivas para motoristas */}
             <Route
               path="/driver-profile"
               element={
@@ -127,12 +139,12 @@ const App = () => (
               }
             />
 
-            {/* 404 */}
+            {/* ❌ Página não encontrada */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
+        </TooltipProvider>
+      </AuthProvider>
+    </BrowserRouter>
   </QueryClientProvider>
 );
 

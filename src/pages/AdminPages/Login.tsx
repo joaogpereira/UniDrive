@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,9 +12,17 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Se já estiver logado e estiver na rota /login, garante redirecionamento para /regions
+  useEffect(() => {
+    if (user && location.pathname === "/login") {
+      navigate("/regions", { replace: true });
+    }
+  }, [user, location.pathname, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,22 +39,55 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      await login(email, password);
-      toast({
-        title: "Sucesso!",
-        description: "Login realizado com sucesso.",
+      // Tenta logar
+      const result = await login(email, password);
+      console.debug("login result:", result);
+
+      // Determina se o e‑mail está verificado a partir do retorno do login ou do currentUser do contexto
+      let isEmailVerified = false;
+      const resAny = result as any;
+      if (resAny && typeof resAny === "object") {
+        // usa optional chaining para evitar acesso a null/undefined
+        isEmailVerified = Boolean(resAny?.user?.emailVerified) || Boolean(resAny?.emailVerified);
+      } else if (typeof result === "boolean") {
+        // caso o login retorne apenas um booleano (sucesso/erro), não temos info de verificação aqui
+        isEmailVerified = false;
+      }
+      // fallback para currentUser (caso o contexto atualize o usuário após o login)
+      if (!isEmailVerified && user) {
+        isEmailVerified = Boolean((user as any).emailVerified);
+      }
+
+      if (isEmailVerified) {
+        toast({
+          title: "Sucesso!",
+          description: "Login realizado com sucesso.",
+        });
+      } else {
+        toast({
+          title: "Atenção: email não verificado",
+          description:
+            "Seu endereço de email ainda não foi verificado. Verifique sua caixa de entrada.",
+          variant: "destructive",
+        });
+      }
+
+      // Navega para /regions informando se precisa de verificação (para a página lidar com isso)
+      // usa replace para evitar histórico confuso / sobreposição por handlers externos
+      navigate("/regions", {
+        replace: true,
+        state: { requireEmailVerification: !isEmailVerified },
       });
-      navigate("/regions");
     } catch (error) {
-      console.error("Login error:", error);
       toast({
         title: "Erro no login",
         description: "Email ou senha incorretos. Tente novamente.",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
+    } finally{
+        setIsLoading(false);
     }
+
   };
 
   return (

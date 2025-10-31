@@ -1,6 +1,5 @@
-
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,9 +13,17 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // se já estiver autenticado enquanto estiver na rota /login, garante redirecionamento para /regions
+  useEffect(() => {
+    if (user && location.pathname === "/login") {
+      navigate("/regions", { replace: true });
+    }
+  }, [user, location.pathname, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +45,7 @@ const Login = () => {
         title: "Sucesso!",
         description: "Login realizado com sucesso.",
       });
-      navigate("/");
+      navigate("/regions", { replace: true });
     } catch (error) {
       console.error("Login error:", error);
       toast({
