@@ -28,6 +28,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [driver, setDriver] = useState<any | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -35,11 +36,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const storedToken = localStorage.getItem("token");
+    const storedDriver = localStorage.getItem("driver");
 
     if (storedUser && storedToken) {
       setUser(JSON.parse(storedUser));
       setToken(storedToken);
       setIsAuthenticated(true);
+      if (storedDriver) setDriver(JSON.parse(storedDriver));
     }
 
     setIsLoading(false);
@@ -67,6 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // salva no estado e storage
       setUser(user);
+      setDriver(Driver);
       setToken(data.token);
       setIsAuthenticated(true);
       localStorage.setItem("user", JSON.stringify(user));
@@ -106,11 +110,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ...data.user,
       tipo_usuario: data.user.tipo_usuario,
     };
-
+    const Driver = data.driver_profile || null;
     setUser(user);
     setToken(data.token);
+    setDriver(Driver);
     setIsAuthenticated(true);
     localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("driver", JSON.stringify(Driver));
     localStorage.setItem("token", data.token);
   };
 
@@ -118,8 +124,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
     setToken(null);
+    setDriver(null);
     setIsAuthenticated(false);
     localStorage.removeItem("user");
+    localStorage.removeItem("driver");
     localStorage.removeItem("token");
   };
 
