@@ -7,7 +7,7 @@ import { Search, ShieldCheck, Lock, Users } from "lucide-react";
 const libraries: ("places")[] = ["places"];
 const mapContainerStyle: React.CSSProperties = {
   width: "100%",
-  height: "500px",
+  height: "600px",
 };
 
 const center = { lat: -15.7975, lng: -47.8919 }; // Brasília
@@ -82,43 +82,6 @@ export default function Regions() {
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-white to-blue-50 overflow-hidden">
       <Navbar />
-
-      {/* Linhas azuis sutis */}
-      <motion.svg
-        className="absolute inset-0 z-0 opacity-30"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 1920 1080"
-        preserveAspectRatio="none"
-        animate={{ x: [0, -50, 0] }}
-        transition={{ repeat: Infinity, duration: 25, ease: "easeInOut" }}
-      >
-        <path
-          d="M0,200 Q480,300 960,200 T1920,200"
-          stroke="#8cc8ff"
-          strokeWidth="2"
-          fill="none"
-        />
-        <path
-          d="M0,500 Q480,600 960,500 T1920,500"
-          stroke="#b3dcff"
-          strokeWidth="1.5"
-          fill="none"
-        />
-        <path
-          d="M0,800 Q480,900 960,800 T1920,800"
-          stroke="#a0d2ff"
-          strokeWidth="2"
-          fill="none"
-        />
-      </motion.svg>
-
-      {/* Fundo diagonal */}
-      <motion.div
-        className="absolute inset-0 bg-[linear-gradient(135deg,rgba(10,178,250,0.25)_25%,transparent_25%,transparent_50%,rgba(10,178,250,0.25)_50%,rgba(10,178,250,0.25)_75%,transparent_75%,transparent)] bg-[length:80px_80px] z-0 opacity-10"
-        animate={{ backgroundPositionX: ["0px", "80px"] }}
-        transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
-      />
-
       <div className="relative pt-24 pb-10 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto z-10">
         <motion.h1
           className="text-3xl font-bold text-gray-900 mb-6 text-center"

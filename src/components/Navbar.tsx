@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom"; // Importa useNavigate
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { LogOut, User } from "lucide-react";
+import Logo from "@/assets/logo-unidrive.png";
 
 const Navbar = () => {
   const { isAuthenticated, logout, user } = useAuth();
@@ -17,11 +18,14 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0">
-              <span className="font-bold text-xl text-unidriver-600">
-                Unidriver
-              </span>
-            </Link>
+            <Link to="/" className="flex-shrink-0 flex items-center">
+  <img
+    src={Logo}
+    alt="Unidrive Logo"
+    className="h-[100px] w-auto object-contain"
+  />
+</Link>
+
           </div>
 
           <div className="flex items-center gap-4">

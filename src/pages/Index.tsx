@@ -1,6 +1,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Car, Leaf, PiggyBank, Ticket } from "lucide-react";
+import Logo from "@/assets/logo-unidrive.png";
+
 
 // --------- Motion Variants ---------
 const fadeUp = {
@@ -48,6 +50,7 @@ function Navbar() {
     { href: "#beneficios", label: "Benefícios" },
     { href: "#cta", label: "Começar" },
   ];
+
   return (
     <header className="fixed top-0 inset-x-0 z-40 bg-white/90 backdrop-blur border-b border-gray-200">
       <motion.nav
@@ -56,13 +59,19 @@ function Navbar() {
         animate="show"
         variants={stagger}
       >
+        {/* ✅ LOGO GRANDE */}
         <motion.a
           variants={navItem}
           href="#"
-          className="text-2xl font-bold text-gray-900 tracking-tight"
+          className="flex items-center gap-2"
         >
-          <span className="text-unidriver-600">Uni</span>Drive
+          <img
+            src={Logo}
+            alt="Unidrive Logo"
+            className="h-[100px] w-auto object-contain"  // ✅ AQUI VOCÊ AUMENTA
+          />
         </motion.a>
+
         <div className="hidden sm:flex items-center gap-8">
           {links.map((lk) => (
             <motion.a
@@ -71,7 +80,7 @@ function Navbar() {
               href={lk.href}
               onClick={(e) => {
                 e.preventDefault();
-                smoothScrollTo(lk.href, 1000); // ~1s, mais devagar
+                smoothScrollTo(lk.href, 1000);
               }}
               className="relative text-base font-medium text-gray-700 hover:text-gray-900 leading-none"
               whileHover={{ y: -1 }}
