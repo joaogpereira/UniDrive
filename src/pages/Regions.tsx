@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+import { GoogleMap, Marker, useJsApiLoader, Autocomplete } from "@react-google-maps/api";
 import Navbar from "@/components/Navbar";
 import { Search, ShieldCheck, Lock, Users } from "lucide-react";
 
@@ -23,7 +23,8 @@ export default function Regions() {
     { id: string; position: { lat: number; lng: number } }[]
   >([]);
   const [destination, setDestination] = useState("");
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [selectedPlace, setSelectedPlace] = useState<google.maps.LatLngLiteral | null>(null);
+  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
   // Inicializa carros próximos ao centro
   useEffect(() => {
@@ -53,6 +54,20 @@ export default function Regions() {
     return () => clearInterval(interval);
   }, []);
 
+  // Função para buscar o local selecionado
+  const handleSearch = () => {
+    if (autocompleteRef.current) {
+      const place = autocompleteRef.current.getPlace();
+      if (place?.geometry?.location) {
+        const location = {
+          lat: place.geometry.location.lat(),
+          lng: place.geometry.location.lng(),
+        };
+        setSelectedPlace(location);
+      }
+    }
+  };
+
   if (!isLoaded) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-white to-blue-50">
@@ -68,7 +83,7 @@ export default function Regions() {
     <div className="relative min-h-screen bg-gradient-to-b from-white to-blue-50 overflow-hidden">
       <Navbar />
 
-      {/* 🔷 Linhas azuis sutis de fundo (camada visual) */}
+      {/* Linhas azuis sutis */}
       <motion.svg
         className="absolute inset-0 z-0 opacity-30"
         xmlns="http://www.w3.org/2000/svg"
@@ -97,9 +112,9 @@ export default function Regions() {
         />
       </motion.svg>
 
-      {/* Segunda camada sutil de linhas diagonais */}
+      {/* Fundo diagonal */}
       <motion.div
-        className="absolute inset-0 bg-[linear-gradient(135deg,rgba(10, 178, 250, 0.25)_25%,transparent_25%,transparent_50%,rgba(10, 178, 250, 0.25)_50%,rgba(10, 178, 250, 0.25)_75%,transparent_75%,transparent)] bg-[length:80px_80px] z-0 opacity-10"
+        className="absolute inset-0 bg-[linear-gradient(135deg,rgba(10,178,250,0.25)_25%,transparent_25%,transparent_50%,rgba(10,178,250,0.25)_50%,rgba(10,178,250,0.25)_75%,transparent_75%,transparent)] bg-[length:80px_80px] z-0 opacity-10"
         animate={{ backgroundPositionX: ["0px", "80px"] }}
         transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
       />
@@ -113,43 +128,38 @@ export default function Regions() {
           Para onde você quer ir?
         </motion.h1>
 
-        {/* Barra de pesquisa */}
-        <div className="relative max-w-2xl mx-auto mb-10">
-          <div className="flex items-center bg-white shadow-md rounded-full px-4 py-3">
+        {/* Barra de pesquisa + botão */}
+        <div className="relative max-w-2xl mx-auto mb-10 flex items-center gap-2">
+          <div className="flex-grow bg-white shadow-md rounded-full px-4 py-3 flex items-center">
             <Search className="text-gray-500 mr-2" />
-            <input
-              type="text"
-              placeholder="Digite um destino..."
-              className="w-full focus:outline-none text-gray-700"
-              value={destination}
-              onChange={(e) => setDestination(e.target.value)}
-            />
+            <Autocomplete
+              onLoad={(autocomplete) => (autocompleteRef.current = autocomplete)}
+              onPlaceChanged={handleSearch}
+            >
+              <input
+                type="text"
+                placeholder="Digite um destino..."
+                className="w-full focus:outline-none text-gray-700"
+                value={destination}
+                onChange={(e) => setDestination(e.target.value)}
+              />
+            </Autocomplete>
           </div>
 
-          {suggestions.length > 0 && (
-            <div className="absolute bg-white shadow-lg mt-2 rounded-md w-full z-10">
-              {suggestions.map((s, i) => (
-                <div
-                  key={i}
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                  onClick={() => {
-                    setDestination(s);
-                    setSuggestions([]);
-                  }}
-                >
-                  {s}
-                </div>
-              ))}
-            </div>
-          )}
+          <button
+            onClick={handleSearch}
+            className="bg-blue-600 text-white px-5 py-3 rounded-full shadow-md hover:bg-blue-700 transition font-medium"
+          >
+            Buscar
+          </button>
         </div>
 
-        {/* 🗺️ Mapa com carros azuis */}
+        {/* 🗺️ Mapa */}
         <div className="rounded-2xl shadow-xl overflow-hidden relative z-10">
           <GoogleMap
             mapContainerStyle={mapContainerStyle}
             zoom={13}
-            center={center}
+            center={selectedPlace || center}
             options={{
               disableDefaultUI: true,
               zoomControl: true,
@@ -174,10 +184,20 @@ export default function Regions() {
                 }}
               />
             ))}
+
+            {selectedPlace && (
+              <Marker
+                position={selectedPlace}
+                icon={{
+                  url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                  scaledSize: new window.google.maps.Size(44, 44),
+                }}
+              />
+            )}
           </GoogleMap>
         </div>
 
-        {/* 🛡️ Seção de segurança */}
+        {/* Seção de segurança */}
         <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <motion.div
             className="bg-white/80 backdrop-blur-md shadow-md rounded-xl p-6 text-center border border-blue-100 hover:shadow-lg transition"
