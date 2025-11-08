@@ -4,7 +4,7 @@ import { GoogleMap, Marker, useJsApiLoader, Autocomplete } from "@react-google-m
 import Navbar from "@/components/Navbar";
 import { Search, ShieldCheck, Lock, Users } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-
+import CarIcon from "@/assets/baby-car.png";
 const libraries: ("places")[] = ["places"];
 const mapContainerStyle: React.CSSProperties = {
   width: "100%",
@@ -12,8 +12,7 @@ const mapContainerStyle: React.CSSProperties = {
 };
 
 const center = { lat: -15.7975, lng: -47.8919 };
-const blueCarIcon = "https://cdn-icons-png.flaticon.com/512/744/744465.png";
-
+const blueCarIcon = CarIcon
 export default function Regions() {
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
