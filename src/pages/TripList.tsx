@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLocation } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -35,32 +36,20 @@ const regionNames: Record<string, string> = {
 
 const RidesList = () => {
   const { region } = useParams<{ region: string }>();
-  const [rides, setRides] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+
+  const location = useLocation();
+  const tripData = location.state?.tripData;
+
+  const rides = tripData?.trips || [];
+  const loading = false;
+
   const [showCreateModal, setShowCreateModal] = useState(false);
+
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user, isDriver } = useAuth();
 
-  useEffect(() => {
-    const fetchRides = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(
-          `http://127.0.0.1:8000/trips?region=${region || ""}`
-        ); // ajuste se seu backend tiver outra URL
-        const data = await response.json();
-        setRides(data);
-      } catch (err) {
-        console.error(err);
-        setRides([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRides();
-  }, [region]);
+  
 
   const handleRideDetails = (rideId: number) => {
     toast({

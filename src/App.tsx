@@ -75,7 +75,7 @@ const App = () => (
               }
             />
             <Route
-              path="/regions/:region"
+              path="/triplist"
               element={
                 <ProtectedRoute>
                   <RidesList />
