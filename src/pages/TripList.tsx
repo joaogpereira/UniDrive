@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { useLocation } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -20,9 +19,8 @@ import {
   Calendar,
   ArrowLeft,
   Car,
-  Star,
-  MessageCircle,
   Plus,
+  Send,
 } from "lucide-react";
 
 const regionNames: Record<string, string> = {
@@ -36,7 +34,6 @@ const regionNames: Record<string, string> = {
 
 const RidesList = () => {
   const { region } = useParams<{ region: string }>();
-
   const location = useLocation();
   const tripData = location.state?.tripData;
 
@@ -46,24 +43,91 @@ const RidesList = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   const { toast } = useToast();
-  const navigate = useNavigate();
   const { user, isDriver } = useAuth();
 
-  
+  const handleRequestRide = async (ride: any) => {
+  try {
+    const rawToken = localStorage.getItem("token");
+    const token = rawToken?.replace(/^"|"$/g, "");
 
-  const handleRideDetails = (rideId: number) => {
-    toast({
-      title: "Acessando detalhes",
-      description: "Você será direcionado para a tela de detalhes da carona.",
+    console.log("========== DEBUG FRONT RIDE REQUEST ==========");
+    console.log("Usuário do contexto:", user);
+    console.log("É motorista?", isDriver);
+    console.log("Ride completa:", ride);
+    console.log("Trip ID enviado:", ride?.id);
+    console.log("Token existe?", !!token);
+    console.log("Token início:", token ? token.substring(0, 40) + "..." : null);
+    console.log("URL:", "http://localhost:8000/api/ride-requests");
+
+    if (!token) {
+      toast({
+        title: "Usuário não autenticado",
+        description: "Token não encontrado no localStorage.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const response = await fetch("http://localhost:8000/api/ride-requests", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        trip_id: ride.id,
+      }),
     });
-    navigate(`/ride-details/${rideId}`);
-  };
+
+    const responseText = await response.text();
+
+    console.log("Status ride-request:", response.status);
+    console.log("Resposta bruta ride-request:", responseText);
+
+    let data: any = {};
+
+    try {
+      data = JSON.parse(responseText);
+      console.log("Resposta JSON ride-request:", data);
+    } catch {
+      console.log("Ride-request não retornou JSON.");
+    }
+
+    console.log("========== FIM DEBUG FRONT RIDE REQUEST ==========");
+
+    if (!response.ok) {
+      throw new Error(
+        data.error ||
+        data.message ||
+        `Erro HTTP ${response.status}`
+      );
+    }
+
+    toast({
+      title: "Solicitação enviada",
+      description: data.message || "O motorista irá analisar seu pedido.",
+    });
+  } catch (error) {
+    console.error("Erro completo no handleRequestRide:", error);
+
+    toast({
+      title: "Erro ao solicitar participação",
+      description:
+        error instanceof Error
+          ? error.message
+          : "Ocorreu um erro inesperado.",
+      variant: "destructive",
+    });
+  }
+};
 
   const regionName = region ? regionNames[region] : "";
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-50">
       <Navbar />
+
       <div className="pt-24 pb-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="flex items-center mb-8">
           <Link
@@ -103,7 +167,7 @@ const RidesList = () => {
         ) : (
           <div className="space-y-6">
             {rides.length > 0 ? (
-              rides.map((ride, index) => (
+              rides.map((ride: any, index: number) => (
                 <motion.div
                   key={ride.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -140,14 +204,16 @@ const RidesList = () => {
                             <Calendar size={16} className="mr-1" />
                             <span>
                               {new Date(ride.data_partida).toLocaleDateString(
-                                "pt-br"
+                                "pt-BR"
                               )}
                             </span>
                           </div>
+
                           <div className="flex items-center text-gray-600">
                             <Clock size={16} className="mr-1" />
                             <span>{ride.hora_de_partida.slice(0, 5)}</span>
                           </div>
+
                           <div className="flex items-center text-gray-600">
                             <User size={16} className="mr-1" />
                             <span>
@@ -160,19 +226,22 @@ const RidesList = () => {
                         </div>
                       </div>
 
-                      <div className="flex flex-col items-start md:items-end">
-                        <div className="bg-gray-100 px-4 py-2 rounded-full mb-3">
+                      <div className="flex flex-col items-start md:items-end gap-3">
+                        <div className="bg-gray-100 px-4 py-2 rounded-full">
                           <span className="font-semibold text-unidriver-700">
                             R$ {Number(ride.preco_gasolina).toFixed(2)}
                           </span>
                         </div>
-                        <Button
-                          onClick={() => handleRideDetails(ride.id)}
-                          className="w-full md:w-auto"
-                        >
-                          <MessageCircle size={18} className="mr-2" />
-                          Conversar
-                        </Button>
+
+                        {!isDriver && (
+                          <Button
+                            onClick={() => handleRequestRide(ride)}
+                            className="w-full md:w-auto bg-unidriver-600 hover:bg-unidriver-700"
+                          >
+                            <Send size={18} className="mr-2" />
+                            Solicitar participação
+                          </Button>
+                        )}
                       </div>
                     </div>
 
@@ -214,6 +283,7 @@ const RidesList = () => {
           <DialogHeader>
             <DialogTitle>Criar carona em {regionName}</DialogTitle>
           </DialogHeader>
+
           <CreateRideForm
             onSuccess={() => {
               setShowCreateModal(false);

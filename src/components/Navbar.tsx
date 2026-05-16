@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom"; // Importa useNavigate
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { LogOut, User } from "lucide-react";
-import Logo from "@/assets/logo-unidrive.png";
+import Logo from "@/assets/logo/logo-unidrive.png";
 
 const Navbar = () => {
   const { isAuthenticated, logout, user } = useAuth();
@@ -22,7 +22,7 @@ const Navbar = () => {
   <img
     src={Logo}
     alt="Unidrive Logo"
-    className="h-[100px] w-auto object-contain"
+    className="h-[45px] w-auto object-contain"
   />
 </Link>
 

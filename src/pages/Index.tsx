@@ -1,342 +1,237 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Car, Leaf, PiggyBank, Ticket } from "lucide-react";
-import Logo from "@/assets/logo-unidrive.png";
+import heroimg from "@/assets/landing-page/hero/hero-image.png";
+import {
+  ArrowRight,
+  Instagram,
+  Linkedin,
+  Facebook,
+  Play,
+  ShieldCheck,
+  Clock3,
+  Leaf,
+  Users,
+  Eye,
+  HeartHandshake,
+  Target,
+  Sparkles,
+} from "lucide-react";
+import Logonavbar from "@/assets/logo/logo-navbar.png";
+import Logo from "@/assets/logo/logo-unidrive.png";
 
-
-// --------- Motion Variants ---------
+// ---------------------- Motion Variants ----------------------
 const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+  hidden: { opacity: 0, y: 32 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } },
 };
 
 const stagger = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.08 } },
+  show: {
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
 };
 
-const navItem = {
-  hidden: { opacity: 0, y: -8 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.35 } },
-};
-
-// --------- Smooth Scroll Helper (devagar) ---------
-function smoothScrollTo(hash: string, duration = 900) {
+// ---------------------- Smooth Scroll ----------------------
+function smoothScrollTo(hash: string, duration = 1000) {
   const id = hash.startsWith("#") ? hash : `#${hash}`;
   const el = document.querySelector(id) as HTMLElement | null;
   if (!el) return;
-  const headerOffset = 64; // altura da navbar
+
+  const headerOffset = 90;
   const target = el.getBoundingClientRect().top + window.pageYOffset - headerOffset;
   const start = window.pageYOffset;
   const distance = target - start;
   const startTime = performance.now();
 
-  const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const easeInOutCubic = (t: number) =>
+    t < 0.5
+      ? 4 * t * t * t
+      : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
   function loop(now: number) {
     const elapsed = now - startTime;
     const progress = Math.min(elapsed / duration, 1);
     const eased = easeInOutCubic(progress);
+
     window.scrollTo(0, start + distance * eased);
     if (progress < 1) requestAnimationFrame(loop);
   }
+
   requestAnimationFrame(loop);
 }
 
-// ---------------------- Navbar (inline) ----------------------
-function Navbar() {
-  const links = [
-    { href: "#sobre", label: "Missão & Visão" },
-    { href: "#beneficios", label: "Benefícios" },
-    { href: "#cta", label: "Começar" },
-  ];
-
-  return (
-    <header className="fixed top-0 inset-x-0 z-40 bg-white/90 backdrop-blur border-b border-gray-200">
-      <motion.nav
-        className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between"
-        initial="hidden"
-        animate="show"
-        variants={stagger}
-      >
-        {/* ✅ LOGO GRANDE */}
-        <motion.a
-          variants={navItem}
-          href="#"
-          className="flex items-center gap-2"
-        >
-          <img
-            src={Logo}
-            alt="Unidrive Logo"
-            className="h-[100px] w-auto object-contain"  // ✅ AQUI VOCÊ AUMENTA
-          />
-        </motion.a>
-
-        <div className="hidden sm:flex items-center gap-8">
-          {links.map((lk) => (
-            <motion.a
-              key={lk.href}
-              variants={navItem}
-              href={lk.href}
-              onClick={(e) => {
-                e.preventDefault();
-                smoothScrollTo(lk.href, 1000);
-              }}
-              className="relative text-base font-medium text-gray-700 hover:text-gray-900 leading-none"
-              whileHover={{ y: -1 }}
-            >
-              {lk.label}
-              <motion.span
-                layoutId="nav-underline"
-                className="absolute left-0 -bottom-2 h-0.5 w-full bg-unidriver-600 origin-left"
-                initial={{ scaleX: 0, opacity: 0.5 }}
-                whileHover={{ scaleX: 1, opacity: 1 }}
-                transition={{ type: "spring", stiffness: 260, damping: 24 }}
-              />
-            </motion.a>
-          ))}
-        </div>
-      </motion.nav>
-    </header>
-  );
-}
-
-// ---------------------- UIButton (inline) ----------------------
+// ---------------------- Button ----------------------
 function UIButton({
   href,
   children,
   variant = "solid",
-  size = "lg",
   className = "",
 }: {
   href?: string;
   children: React.ReactNode;
-  variant?: "solid" | "outline";
-  size?: "md" | "lg";
+  variant?: "solid" | "outline" | "ghost";
   className?: string;
 }) {
   const base =
-    "inline-flex items-center justify-center rounded-xl font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2";
-  const sizes = size === "lg" ? "px-8 py-3 text-lg" : "px-5 py-2.5 text-sm";
-  const variants =
-    variant === "outline"
-      ? "border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 focus:ring-gray-400"
-      : "bg-unidriver-600 text-white hover:brightness-110 focus:ring-unidriver-400";
-  const cls = `${base} ${sizes} ${variants} ${className}`;
+    "inline-flex items-center justify-center rounded-full font-medium transition-all duration-300";
 
-  const Cmp: any = href ? motion.a : motion.button;
+  const variants = {
+    solid:
+      "bg-[#0A66FF] text-white hover:bg-[#0958dc] shadow-[0_10px_30px_rgba(10,102,255,0.25)]",
+    outline:
+      "border border-white/20 bg-white/8 text-white hover:bg-white/14 backdrop-blur-md",
+    ghost:
+      "text-gray-900 hover:text-[#0A66FF]",
+  };
+
+  const Comp: any = href ? motion.a : motion.button;
   const props = href ? { href } : {};
+
   return (
-    <Cmp
+    <Comp
       {...props}
-      className={cls}
-      whileHover={{ scale: 1.02 }}
+      className={`${base} px-6 py-3 text-sm md:text-base ${variants[variant]} ${className}`}
+      whileHover={{ scale: 1.02, y: -1 }}
       whileTap={{ scale: 0.98 }}
-      transition={{ type: "spring", stiffness: 300, damping: 18 }}
       onClick={(e: any) => {
         if (href && href.startsWith("#")) {
           e.preventDefault();
-          smoothScrollTo(href, 1000);
+          smoothScrollTo(href);
         }
       }}
     >
       {children}
-    </Cmp>
+    </Comp>
   );
 }
 
-// ---------------------- Auth fallback ----------------------
-function useAuthFallback(): { isAuthenticated: boolean; user: { tipo_usuario?: string } | null } {
-  const g: any = (globalThis as any);
-  return g?.UNIDRIVE_AUTH ?? { isAuthenticated: false, user: null };
-}
+// ---------------------- Navbar ----------------------
+function Navbar() {
+  const [showNavbar, setShowNavbar] = useState(false);
 
-// ---------------------- Page ----------------------
-export default function Index({
-  __testAuth,
-}: {
-  __testAuth?: { isAuthenticated: boolean; user?: { tipo_usuario?: string } | null };
-}) {
-  const auth = __testAuth ?? useAuthFallback();
-  const { isAuthenticated, user } = auth;
-  const isDriver = user?.tipo_usuario === "motorista";
+  useEffect(() => {
+    const onScroll = () => {
+      setShowNavbar(window.scrollY > 80);
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const links = [
+    { label: "Quem somos", href: "#quem-somos" },
+    { label: "Por que escolher", href: "#porque-escolher" },
+    { label: "Nossa essência", href: "#nossa-essencia" },
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-blue-50">
-      <Navbar />
+    <motion.header
+      initial={{ y: -120, opacity: 0 }}
+      animate={
+        showNavbar
+          ? { y: 0, opacity: 1 }
+          : { y: -120, opacity: 0 }
+      }
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="fixed top-0 inset-x-0 z-50"
+    >
+      <div className="mx-auto mt-4 max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-20 items-center justify-between rounded-full border border-black/45 bg-black/60 px-6 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.25)]">
+          <a href="#" className="flex items-center gap-3">
+            <img
+              src={Logonavbar}
+              alt="UniDrive"
+              className="h-12 w-auto object-contain"
+            />
+          </a>
 
-      {/* HERO */}
-      <div className="pt-24 pb-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <motion.section
-          className="text-center mt-8"
-          variants={fadeUp}
-          initial="hidden"
-          animate="show"
-        >
-          <motion.h1 className="text-5xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
-            Encontre caronas facilmente com {" "}
-            <span className="text-unidriver-600">UniDrive</span>
-          </motion.h1>
-          <motion.p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto" variants={fadeUp}>
-            Conectamos motoristas e passageiros para viagens mais econômicas, sustentáveis e seguras.
-          </motion.p>
+          <nav className="hidden lg:flex items-center gap-8">
+            {links.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  smoothScrollTo(link.href);
+                }}
+                className="text-sm font-medium text-white/85 transition hover:text-white"
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
 
-          {/* CTA primário */}
-          <motion.div
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
-            variants={stagger}
-            initial="hidden"
-            animate="show"
-          >
-            <motion.div variants={fadeUp}>
-              {isAuthenticated ? (
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                  <UIButton href="/regions">
-                    <span>Encontrar caronas</span>
-                    <ArrowRight className="ml-2" size={18} />
-                  </UIButton>
-                  {isDriver && (
-                    <UIButton href="/create-trip">
-                      <span>Criar nova viagem</span>
-                      <ArrowRight className="ml-2" size={18} />
-                    </UIButton>
-                  )}
-                </div>
-              ) : (
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                  <UIButton href="/register">
-                    <span>Cadastre-se grátis</span>
-                    <ArrowRight className="ml-2" size={18} />
-                  </UIButton>
-                  {/* Link âncora para CTA com smooth scroll */}
-                  <UIButton href="#cta" variant="outline">
-                    Entrar
-                  </UIButton>
-                </div>
-              )}
-            </motion.div>
-          </motion.div>
-
-          <motion.div className="mt-6 text-base text-gray-500" variants={fadeUp}>
-            100% gratuito para estudantes • Comunidade verificada • Em poucos cliques
-          </motion.div>
-        </motion.section>
-
-        {/* Benefícios principais */}
-        <motion.section
-          id="beneficios"
-          className="mt-20 grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8"
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.25 }}
-          variants={stagger}
-        >
-          <FeatureCard
-            icon={<Car className="text-unidriver-600" size={32} />}
-            title="Caronas seguras"
-            description="Motoristas verificados e avaliações da comunidade garantem sua segurança."
-          />
-          <FeatureCard
-            icon={<PiggyBank className="text-unidriver-600" size={32} />}
-            title="Economize de verdade"
-            description="Divida os custos de combustível e pedágio. Mais barato que apps tradicionais."
-          />
-          <FeatureCard
-            icon={<Leaf className="text-unidriver-600" size={32} />}
-            title="Menos CO₂"
-            description="Compartilhe o trajeto e contribua com a redução de emissões na sua cidade."
-          />
-          {/* ✅ Novo quadrado: Gasta menos que ônibus */}
-          <FeatureCard
-            icon={<Ticket className="text-unidriver-600" size={32} />}
-            title="Mais barato que ônibus"
-            description="Pague menos por trajeto compartilhando a viagem com colegas de curso."
-          />
-        </motion.section>
-
-        {/* Missão & Visão */}
-        <motion.section
-          id="sobre"
-          className="mt-24"
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.25 }}
-          variants={stagger}
-        >
-          <motion.div className="text-center mb-10" variants={fadeUp}>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Nossa essência</h2>
-            <p className="mt-3 text-lg text-gray-600 max-w-2xl mx-auto">
-              O porquê da UniDrive existir e para onde estamos indo.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-            <motion.div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100" variants={fadeUp}>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="rounded-full bg-unidriver-100 w-12 h-12 flex items-center justify-center">
-                  <Leaf className="text-unidriver-600" size={24} />
-                </div>
-                <h3 className="text-2xl font-semibold tracking-tight">Missão</h3>
-              </div>
-              <p className="text-gray-700 leading-relaxed text-lg">
-                Conectar universitários para compartilhar caronas de forma segura e acessível, reduzindo custos de deslocamento e a pegada ambiental no dia a dia do campus.
-              </p>
-            </motion.div>
-
-            <motion.div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100" variants={fadeUp}>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="rounded-full bg-unidriver-100 w-12 h-12 flex items-center justify-center">
-                  <PiggyBank className="text-unidriver-600" size={24} />
-                </div>
-                <h3 className="text-2xl font-semibold tracking-tight">Visão</h3>
-              </div>
-              <p className="text-gray-700 leading-relaxed text-lg">
-                Construir um ecossistema de mobilidade universitária que diminui significativamente a poluição nas cidades e alivia o orçamento dos estudantes.
-              </p>
-            </motion.div>
+          <div className="hidden md:flex items-center gap-3">
+            <SocialIcon href="#" icon={<Instagram size={16} />} />
+            <SocialIcon href="#" icon={<Linkedin size={16} />} />
+            <SocialIcon href="#" icon={<Facebook size={16} />} />
           </div>
 
-          {/* Micro-métricas (exemplo estático) */}
-          <motion.div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-6 text-center" variants={stagger}>
-            <Stat label="Universidades" value="50+" />
-            <Stat label="Caronas organizadas" value="10k+" />
-            <Stat label="R$ economizados" value="1M+" />
-            <Stat label="kg CO₂ evitados" value="250k+" />
-          </motion.div>
-        </motion.section>
-
-        {/* CTA final */}
-        <motion.section
-          id="cta"
-          className="mt-24"
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.25 }}
-        >
-          <div className="bg-gradient-to-r from-unidriver-100 to-white border border-gray-100 rounded-2xl p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-              <h3 className="text-2xl font-semibold text-gray-900 mb-2 tracking-tight">Pronto para fazer parte?</h3>
-              <p className="text-lg text-gray-600">Leva menos de 2 minutos para criar sua conta e começar a economizar.</p>
-            </div>
-            <div className="flex gap-3">
-              <UIButton href={isAuthenticated ? "/regions" : "/register"}>
-                {isAuthenticated ? "Encontrar caronas" : "Criar conta"}
-                <ArrowRight className="ml-2" size={18} />
-              </UIButton>
-              {!isAuthenticated && (
-                <UIButton href="/login" variant="outline">Entrar</UIButton>
-              )}
-            </div>
+          <div className="flex items-center gap-3">
+            <UIButton href="/login" variant="outline" className="hidden sm:inline-flex">
+              Login
+            </UIButton>
+            <UIButton href="/register" variant="solid">
+              Cadastre-se
+            </UIButton>
           </div>
-        </motion.section>
+        </div>
       </div>
-    </div>
+    </motion.header>
   );
 }
 
-// ---------------------- Auxiliares ----------------------
-function FeatureCard({
+function SocialIcon({
+  href,
+  icon,
+}: {
+  href: string;
+  icon: React.ReactNode;
+}) {
+  return (
+    <motion.a
+      href={href}
+      whileHover={{ scale: 1.08, y: -1 }}
+      whileTap={{ scale: 0.96 }}
+      className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white/85 backdrop-blur-md transition hover:bg-white/15"
+    >
+      {icon}
+    </motion.a>
+  );
+}
+
+// ---------------------- Feature Slide Card ----------------------
+function WhyCard({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
+  return (
+    <motion.div
+      variants={fadeUp}
+      whileHover={{ y: -6 }}
+      className="group relative min-w-[280px] md:min-w-[320px] overflow-hidden rounded-[28px] border border-white/10 bg-[#0b0b0d] shadow-[0_20px_50px_rgba(0,0,0,0.25)]"
+    >
+      <div className="h-52 w-full bg-[linear-gradient(135deg,#0A66FF_0%,#0d1b3d_60%,#05070c_100%)]" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 p-6">
+        <h3 className="text-xl font-semibold text-white">{title}</h3>
+        <p className="mt-2 text-sm leading-relaxed text-white/75">
+          {description}
+        </p>
+      </div>
+    </motion.div>
+  );
+}
+
+// ---------------------- Value Card ----------------------
+function ValueCard({
   icon,
   title,
   description,
@@ -347,64 +242,366 @@ function FeatureCard({
 }) {
   return (
     <motion.div
-      className="bg-white rounded-xl shadow-lg p-8 text-center border border-gray-100"
       variants={fadeUp}
-      whileHover={{ y: -4, scale: 1.02 }}
-      whileTap={{ scale: 0.995 }}
-      transition={{ type: "spring", stiffness: 260, damping: 20 }}
+      whileHover={{ y: -6, scale: 1.01 }}
+      className="group rounded-[24px] border border-black/10 bg-white p-6 transition-all duration-300 hover:border-[#0A66FF]/30 hover:shadow-[0_20px_40px_rgba(10,102,255,0.12)]"
     >
-      <div className="rounded-full bg-unidriver-100 w-16 h-16 flex items-center justify-center mx-auto mb-4">
+      <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#0A66FF]/10 text-[#0A66FF] transition group-hover:bg-[#0A66FF] group-hover:text-white">
         {icon}
       </div>
-      <h3 className="text-xl font-semibold mb-2 tracking-tight">{title}</h3>
-      <p className="text-gray-600 text-base">{description}</p>
+
+      <h4 className="text-lg font-semibold text-black">{title}</h4>
+      <p className="mt-2 text-sm leading-relaxed text-gray-600">
+        {description}
+      </p>
     </motion.div>
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+// ---------------------- Main Page ----------------------
+export default function Index() {
   return (
-    <motion.div
-      className="bg-white rounded-xl shadow p-6 border border-gray-100"
-      variants={fadeUp}
-      whileHover={{ scale: 1.02 }}
-      transition={{ type: "spring", stiffness: 260, damping: 20 }}
-    >
-      <div className="text-3xl font-bold text-unidriver-600 tracking-tight">{value}</div>
-      <div className="text-gray-500 mt-1 text-base font-medium">{label}</div>
-    </motion.div>
+    <div className="bg-white text-black overflow-x-hidden">
+      <Navbar />
+
+      {/* HERO */}
+      <section className="relative h-screen w-full overflow-hidden text-white">
+
+
+  {/* 🖼️ FALLBACK IMAGE */}
+  <img
+    src={heroimg}
+    alt="UniDrive background"
+    className="absolute inset-0 w-full h-full object-cover"
+  />
+
+  {/* 🌑 OVERLAY */}
+  <div className="absolute inset-0 bg-black/60" />
+  
+
+  {/* 🎯 CONTENT */}
+  <div className="relative z-10 h-full flex items-center">
+    <div className="max-w-7xl mx-auto px-6 w-full">
+
+      <div className="max-w-2xl">
+        {/* LOGO */}
+        <div className="z-20">
+          <img
+            src={Logo}
+            alt="UniDrive"
+            className="h-32 md:h-32 object-contain"
+          />
+        </div>
+        <h1 className="text-5xl font-bold leading-tight md:text-7xl">
+          
+          <span className="block">Economize</span>
+          <span className="block text-blue-500">tempo e dinheiro</span>
+        </h1>
+
+        <p className="mt-6 text-lg text-white/80">
+          Conectamos estudantes para uma mobilidade mais econômica,
+          moderna e sustentável.
+        </p>
+
+        <div className="mt-8 flex gap-4">
+          <button className="bg-blue-600 px-6 py-3 rounded-full font-medium hover:bg-blue-700 transition">
+            Começar agora
+          </button>
+
+          <button className="border border-white/30 px-6 py-3 rounded-full backdrop-blur hover:bg-white/10 transition">
+            Ver como funciona
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+      {/* QUEM SOMOS */}
+      <section id="quem-somos" className="relative py-24 md:py-32">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={stagger}
+          >
+            <motion.div variants={fadeUp} className="mb-10 text-center">
+              <span className="text-sm font-semibold uppercase tracking-[0.22em] text-[#0A66FF]">
+                Quem somos
+              </span>
+              <h2 className="mt-4 text-3xl font-bold tracking-tight text-black md:text-5xl">
+                Uma nova forma de viver a mobilidade universitária.
+              </h2>
+            </motion.div>
+
+            <motion.div
+              variants={fadeUp}
+              className="relative overflow-hidden rounded-[36px] border border-black/10 bg-[#f6f8fc] p-4 md:p-6 shadow-[0_20px_60px_rgba(0,0,0,0.08)]"
+            >
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+                <div className="relative min-h-[420px] overflow-hidden rounded-[28px] bg-[linear-gradient(135deg,#0A66FF_0%,#dfe9ff_45%,#ffffff_100%)]">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.8),transparent_30%)]" />
+                  <div className="absolute inset-0 flex items-end p-8 md:p-10">
+                    <div className="max-w-xl rounded-[28px] border border-white/40 bg-white/70 p-6 backdrop-blur-xl shadow-lg">
+                      <span className="text-xs font-semibold uppercase tracking-[0.22em] text-[#0A66FF]">
+                        Sobre a UniDrive
+                      </span>
+                      <h3 className="mt-3 text-2xl font-semibold text-black md:text-3xl">
+                        Conectamos pessoas, trajetos e propósito.
+                      </h3>
+                      <p className="mt-4 text-sm leading-relaxed text-gray-700 md:text-base">
+                        A UniDrive nasceu para tornar o deslocamento universitário
+                        mais inteligente. Nossa proposta une economia, praticidade,
+                        segurança e consciência coletiva em uma experiência moderna,
+                        pensada para a rotina real dos estudantes.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col justify-center rounded-[28px] bg-white p-8 md:p-10">
+                  <span className="text-sm font-semibold uppercase tracking-[0.22em] text-[#0A66FF]">
+                    Nosso papel
+                  </span>
+
+                  <p className="mt-5 text-base leading-relaxed text-gray-700 md:text-lg">
+                    Mais do que caronas, criamos uma plataforma com potencial para
+                    transformar a cultura de deslocamento universitário, reduzindo
+                    custos, otimizando tempo e incentivando uma comunidade mais
+                    conectada.
+                  </p>
+
+                  <div className="mt-8 space-y-4">
+                    <InfoLine title="Mais economia" text="Divisão inteligente de custos no dia a dia." />
+                    <InfoLine title="Mais conexão" text="Estudantes compartilhando rotas e experiências." />
+                    <InfoLine title="Mais eficiência" text="Uma jornada simples, intuitiva e moderna." />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* POR QUE ESCOLHER */}
+      <section
+        id="porque-escolher"
+        className="bg-[#05070c] py-24 text-white md:py-32"
+      >
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={stagger}
+          >
+            <motion.div variants={fadeUp} className="mb-10 md:mb-14">
+              <span className="text-sm font-semibold uppercase tracking-[0.22em] text-[#0A66FF]">
+                Por que escolher a UniDrive
+              </span>
+              <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                <h2 className="max-w-2xl text-3xl font-bold tracking-tight md:text-5xl">
+                  Uma experiência pensada para ser bonita, útil e realmente valiosa.
+                </h2>
+                <p className="max-w-xl text-sm leading-relaxed text-white/70 md:text-base">
+                  Aqui você pode depois trocar essas imagens por prints do app,
+                  fotos conceituais, mockups ou imagens da vida universitária.
+                </p>
+              </div>
+            </motion.div>
+
+            <motion.div
+              variants={stagger}
+              className="flex gap-5 overflow-x-auto pb-2 [scrollbar-width:none] [-ms-overflow-style:none]"
+            >
+              <WhyCard
+                title="Economia real"
+                description="Reduza gastos recorrentes com transporte em uma solução prática para a rotina universitária."
+              />
+              <WhyCard
+                title="Mais segurança"
+                description="Construa confiança com uma plataforma voltada para uma comunidade universitária conectada."
+              />
+              <WhyCard
+                title="Menos impacto ambiental"
+                description="Compartilhar trajetos é uma forma inteligente de reduzir emissões e congestionamentos."
+              />
+              <WhyCard
+                title="Experiência moderna"
+                description="Uma interface simples, intuitiva e visualmente forte para gerar confiança desde o primeiro acesso."
+              />
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* NOSSA ESSÊNCIA */}
+      <section id="nossa-essencia" className="py-24 md:py-32 bg-white">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.15 }}
+            variants={stagger}
+          >
+            <motion.div variants={fadeUp} className="mb-12 text-center">
+              <span className="text-sm font-semibold uppercase tracking-[0.22em] text-[#0A66FF]">
+                Nossa essência
+              </span>
+              <h2 className="mt-4 text-3xl font-bold tracking-tight text-black md:text-5xl">
+                Missão, visão e valores que movem a UniDrive.
+              </h2>
+            </motion.div>
+
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_1.05fr]">
+              <motion.div
+                variants={fadeUp}
+                className="overflow-hidden rounded-[32px] border border-black/10 bg-[#f5f8ff] shadow-[0_20px_60px_rgba(0,0,0,0.08)]"
+              >
+                <div className="h-[320px] md:h-[420px] bg-[linear-gradient(135deg,#0A66FF_0%,#dbe8ff_45%,#ffffff_100%)]" />
+                <div className="border-t border-black/10 p-8">
+                  <h3 className="text-2xl font-semibold text-black">
+                    Espaço para imagem institucional
+                  </h3>
+                  <p className="mt-3 text-gray-600">
+                    Aqui você pode colocar uma imagem forte da marca, estudantes,
+                    campus ou um mockup grande do sistema.
+                  </p>
+                </div>
+              </motion.div>
+
+              <div className="space-y-6">
+                <motion.div
+                  variants={fadeUp}
+                  className="rounded-[28px] border border-black/10 bg-black p-8 text-white shadow-[0_20px_50px_rgba(0,0,0,0.18)]"
+                >
+                  <div className="flex items-center gap-3">
+                    <Target className="text-[#0A66FF]" size={22} />
+                    <h3 className="text-2xl font-semibold">Missão</h3>
+                  </div>
+                  <p className="mt-4 text-white/75 leading-relaxed">
+                    Transformar a mobilidade universitária em uma experiência mais
+                    econômica, conectada e segura, oferecendo uma solução prática
+                    para estudantes que buscam otimizar sua rotina.
+                  </p>
+                </motion.div>
+
+                <motion.div
+                  variants={fadeUp}
+                  className="rounded-[28px] border border-black/10 bg-[#0A66FF] p-8 text-white shadow-[0_20px_50px_rgba(10,102,255,0.22)]"
+                >
+                  <div className="flex items-center gap-3">
+                    <Eye className="text-white" size={22} />
+                    <h3 className="text-2xl font-semibold">Visão</h3>
+                  </div>
+                  <p className="mt-4 text-white/85 leading-relaxed">
+                    Ser referência em mobilidade universitária inteligente,
+                    conectando inovação, impacto social e experiência digital de
+                    alto nível.
+                  </p>
+                </motion.div>
+
+                <motion.div
+                  variants={stagger}
+                  className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+                >
+                  <ValueCard
+                    icon={<Users size={22} />}
+                    title="Comunidade"
+                    description="Valorizamos conexões reais entre pessoas com objetivos em comum."
+                  />
+                  <ValueCard
+                    icon={<ShieldCheck size={22} />}
+                    title="Segurança"
+                    description="Projetamos confiança como parte essencial da experiência."
+                  />
+                  <ValueCard
+                    icon={<HeartHandshake size={22} />}
+                    title="Colaboração"
+                    description="Compartilhar trajetos é compartilhar valor, tempo e oportunidade."
+                  />
+                  <ValueCard
+                    icon={<Leaf size={22} />}
+                    title="Sustentabilidade"
+                    description="Mobilidade mais inteligente também significa menos impacto para a cidade."
+                  />
+                </motion.div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* CTA FINAL */}
+      <section className="bg-[#05070c] py-20 text-white">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.7 }}
+            className="overflow-hidden rounded-[32px] border border-white/10 bg-[linear-gradient(135deg,rgba(10,102,255,0.22),rgba(255,255,255,0.04))] p-8 md:p-12 shadow-[0_25px_70px_rgba(0,0,0,0.25)]"
+          >
+            <div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
+              <div className="max-w-2xl">
+                <span className="text-sm font-semibold uppercase tracking-[0.22em] text-[#8bb6ff]">
+                  Comece agora
+                </span>
+                <h2 className="mt-4 text-3xl font-bold tracking-tight md:text-5xl">
+                  Entre para a UniDrive e eleve sua rotina universitária.
+                </h2>
+                <p className="mt-4 text-white/70 md:text-lg">
+                  Uma landing premium precisa terminar com uma chamada forte, clara
+                  e elegante. Aqui está esse espaço.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <UIButton href="/register" variant="solid">
+                  Criar conta
+                  <ArrowRight className="ml-2" size={18} />
+                </UIButton>
+                <UIButton href="/login" variant="outline">
+                  Fazer login
+                </UIButton>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    </div>
   );
 }
 
-/*
-============================================================
-🧪 Testes (adicione em `Index.test.tsx` com Vitest + RTL)
-============================================================
-import { render, screen, fireEvent } from "@testing-library/react";
-import Index from "./Index";
+// ---------------------- Helpers ----------------------
+function MiniInfo({
+  title,
+  subtitle,
+}: {
+  title: string;
+  subtitle: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/6 p-4 backdrop-blur-md">
+      <div className="text-sm font-semibold text-white">{title}</div>
+      <div className="mt-1 text-xs text-white/65">{subtitle}</div>
+    </div>
+  );
+}
 
-describe("Landing CTAs", () => {
-  it("mostra CTAs de cadastro/entrar quando não autenticado", () => {
-    render(<Index __testAuth={{ isAuthenticated: false, user: null }} />);
-    expect(screen.getByText(/Cadastre-se grátis|Criar conta/i)).toBeInTheDocument();
-    expect(screen.getByText(/Entrar/i)).toBeInTheDocument();
-  });
-
-  it("mostra 'Encontrar caronas' quando autenticado (passageiro)", () => {
-    render(<Index __testAuth={{ isAuthenticated: true, user: { tipo_usuario: "passageiro" } }} />);
-    expect(screen.getByText(/Encontrar caronas/i)).toBeInTheDocument();
-    expect(screen.queryByText(/Entrar/i)).not.toBeInTheDocument();
-  });
-
-  it("mostra 'Criar nova viagem' quando autenticado e motorista", () => {
-    render(<Index __testAuth={{ isAuthenticated: true, user: { tipo_usuario: "motorista" } }} />);
-    expect(screen.getByText(/Criar nova viagem/i)).toBeInTheDocument();
-  });
-
-  it("renderiza Missão e Visão", () => {
-    render(<Index __testAuth={{ isAuthenticated: false }} />);
-    expect(screen.getByText(/Missão/i)).toBeInTheDocument();
-    expect(screen.getByText(/Visão/i)).toBeInTheDocument();
-  });
-});
-*/
+function InfoLine({
+  title,
+  text,
+}: {
+  title: string;
+  text: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-black/8 bg-[#f8faff] px-4 py-4">
+      <div className="text-sm font-semibold text-black">{title}</div>
+      <div className="mt-1 text-sm text-gray-600">{text}</div>
+    </div>
+  );
+}
